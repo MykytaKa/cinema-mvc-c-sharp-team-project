@@ -10,9 +10,9 @@ namespace Core.Entities
     public class Genre
     {
         [Key]
-        public int Genre_ID { get; set; }
+        public int Id { get; set; }
 
-        public string Genre_Name { get; set; }
+        public string Name { get; set; }
 
         public ICollection<Film> Films { get; set; }
     }

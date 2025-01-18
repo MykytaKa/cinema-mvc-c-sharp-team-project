@@ -10,9 +10,9 @@ namespace Core.Entities
     public class Region
     {
         [Key]
-        public int Region_ID { get; set; }
+        public int Id { get; set; }
 
-        public string Region_Name { get; set; }
+        public string Name { get; set; }
 
         public ICollection<Cinema> Cinemas { get; set; }
     }

@@ -32,13 +32,13 @@ namespace Infrastructure.Data
             modelBuilder.Entity<Ticket>()
                 .HasOne(t => t.Booking)
                 .WithMany(b => b.Tickets)
-                .HasForeignKey(t => t.Booking_ID)
+                .HasForeignKey(t => t.BookingId)
                 .OnDelete(DeleteBehavior.Cascade); // Це залишається каскадним
 
             modelBuilder.Entity<Ticket>()
                 .HasOne(t => t.Seat)
                 .WithMany(s => s.Tickets)
-                .HasForeignKey(t => t.Seat_ID)
+                .HasForeignKey(t => t.SeatId)
                 .OnDelete(DeleteBehavior.Restrict); // Тут вимикаємо каскадне видалення
 
             // Додаткові конфігурації, якщо необхідно

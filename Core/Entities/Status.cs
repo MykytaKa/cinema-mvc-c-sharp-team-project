@@ -10,9 +10,9 @@ namespace Core.Entities
     public class Status
     {
         [Key]
-        public int Status_ID { get; set; }
+        public int Id { get; set; }
 
-        public string Status_Name { get; set; }
+        public string Name { get; set; }
 
         public ICollection<Booking> Bookings { get; set; }
     }

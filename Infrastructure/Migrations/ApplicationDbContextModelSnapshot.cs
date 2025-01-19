@@ -24,56 +24,47 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Entities.Booking", b =>
                 {
-                    b.Property<int>("Booking_ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Booking_ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date_Time")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Session_ID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Session_ID1")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status_ID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status_ID1")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Sum")
+                    b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("User_ID")
+                    b.Property<int>("SessionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("User_ID1")
+                    b.Property<int>("StatusId")
                         .HasColumnType("int");
 
-                    b.HasKey("Booking_ID");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("Session_ID1");
+                    b.HasKey("Id");
 
-                    b.HasIndex("Status_ID1");
+                    b.HasIndex("SessionId");
 
-                    b.HasIndex("User_ID1");
+                    b.HasIndex("StatusId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("Core.Entities.Cinema", b =>
                 {
-                    b.Property<int>("Cinema_ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Cinema_ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Cinema_Name")
+                    b.Property<string>("Building")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -81,30 +72,31 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Location")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Region_ID")
+                    b.Property<int>("RegionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Region_ID1")
-                        .HasColumnType("int");
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Cinema_ID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("Region_ID1");
+                    b.HasIndex("RegionId");
 
                     b.ToTable("Cinemas");
                 });
 
             modelBuilder.Entity("Core.Entities.Film", b =>
                 {
-                    b.Property<int>("Film_ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Film_ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Actors")
                         .IsRequired()
@@ -129,13 +121,10 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Genre_ID")
+                    b.Property<int>("GenreId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Genre_ID1")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Poster")
+                    b.Property<string>("PosterURL")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -145,113 +134,107 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("Release_Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Trailer")
+                    b.Property<string>("TrailerURL")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Film_ID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("Genre_ID1");
+                    b.HasIndex("GenreId");
 
                     b.ToTable("Films");
                 });
 
             modelBuilder.Entity("Core.Entities.Genre", b =>
                 {
-                    b.Property<int>("Genre_ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Genre_ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Genre_Name")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Genre_ID");
+                    b.HasKey("Id");
 
                     b.ToTable("Genres");
                 });
 
             modelBuilder.Entity("Core.Entities.Hall", b =>
                 {
-                    b.Property<int>("Hall_ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Hall_ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Cinema_ID")
+                    b.Property<int>("CinemaId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Cinema_ID1")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Hall_Name")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Number_Of_Seats")
                         .HasColumnType("int");
 
-                    b.HasKey("Hall_ID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("Cinema_ID1");
+                    b.HasIndex("CinemaId");
 
                     b.ToTable("Halls");
                 });
 
             modelBuilder.Entity("Core.Entities.Region", b =>
                 {
-                    b.Property<int>("Region_ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Region_ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Region_Name")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Region_ID");
+                    b.HasKey("Id");
 
                     b.ToTable("Regions");
                 });
 
             modelBuilder.Entity("Core.Entities.Seat", b =>
                 {
-                    b.Property<int>("Seat_ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Seat_ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Column")
                         .HasColumnType("int");
 
-                    b.Property<int>("Hall_ID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Hall_ID1")
+                    b.Property<int>("HallId")
                         .HasColumnType("int");
 
                     b.Property<int>("Row")
                         .HasColumnType("int");
 
-                    b.HasKey("Seat_ID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("Hall_ID1");
+                    b.HasIndex("HallId");
 
                     b.ToTable("Seats");
                 });
 
             modelBuilder.Entity("Core.Entities.Session", b =>
                 {
-                    b.Property<int>("Session_ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Session_ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date_Time_Beg")
                         .HasColumnType("datetime2");
@@ -259,77 +242,69 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("Date_Time_End")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Film_ID")
+                    b.Property<int>("FilmId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Film_ID1")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Hall_ID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Hall_ID1")
+                    b.Property<int>("HallId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("Session_ID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("Film_ID1");
-
-                    b.HasIndex("Hall_ID1");
+                    b.HasIndex("FilmId");
 
                     b.ToTable("Sessions");
                 });
 
             modelBuilder.Entity("Core.Entities.Status", b =>
                 {
-                    b.Property<int>("Status_ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Status_ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Status_Name")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Status_ID");
+                    b.HasKey("Id");
 
                     b.ToTable("Status");
                 });
 
             modelBuilder.Entity("Core.Entities.Ticket", b =>
                 {
-                    b.Property<int>("Ticket_ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Ticket_ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Booking_ID")
+                    b.Property<int>("BookingId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Seat_ID")
+                    b.Property<int>("SeatId")
                         .HasColumnType("int");
 
-                    b.HasKey("Ticket_ID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("Booking_ID");
+                    b.HasIndex("BookingId");
 
-                    b.HasIndex("Seat_ID");
+                    b.HasIndex("SeatId");
 
                     b.ToTable("Tickets");
                 });
 
             modelBuilder.Entity("Core.Entities.User", b =>
                 {
-                    b.Property<int>("User_ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("User_ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date_Of_Birthday")
                         .HasColumnType("datetime2");
@@ -346,9 +321,6 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ID_Type")
-                        .HasColumnType("int");
-
                     b.Property<string>("Last_Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -357,29 +329,29 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("User_TypeID_Type")
+                    b.Property<int>("TypeId")
                         .HasColumnType("int");
 
-                    b.HasKey("User_ID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("User_TypeID_Type");
+                    b.HasIndex("TypeId");
 
                     b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Core.Entities.User_Type", b =>
                 {
-                    b.Property<int>("ID_Type")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Type"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Type_Name")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ID_Type");
+                    b.HasKey("Id");
 
                     b.ToTable("User_Types");
                 });
@@ -388,19 +360,19 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Core.Entities.Session", "Session")
                         .WithMany("Bookings")
-                        .HasForeignKey("Session_ID1")
+                        .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Core.Entities.Status", "Status")
                         .WithMany("Bookings")
-                        .HasForeignKey("Status_ID1")
+                        .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Core.Entities.User", "User")
                         .WithMany("Bookings")
-                        .HasForeignKey("User_ID1")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -415,7 +387,7 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Core.Entities.Region", "Region")
                         .WithMany("Cinemas")
-                        .HasForeignKey("Region_ID1")
+                        .HasForeignKey("RegionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -426,7 +398,7 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Core.Entities.Genre", "Genre")
                         .WithMany("Films")
-                        .HasForeignKey("Genre_ID1")
+                        .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -437,7 +409,7 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Core.Entities.Cinema", "Cinema")
                         .WithMany("Halls")
-                        .HasForeignKey("Cinema_ID1")
+                        .HasForeignKey("CinemaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -448,7 +420,7 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Core.Entities.Hall", "Hall")
                         .WithMany("Seats")
-                        .HasForeignKey("Hall_ID1")
+                        .HasForeignKey("HallId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -459,13 +431,13 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Core.Entities.Film", "Film")
                         .WithMany("Sessions")
-                        .HasForeignKey("Film_ID1")
+                        .HasForeignKey("FilmId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Core.Entities.Hall", "Hall")
                         .WithMany("Sessions")
-                        .HasForeignKey("Hall_ID1")
+                        .HasForeignKey("FilmId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -478,13 +450,13 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Core.Entities.Booking", "Booking")
                         .WithMany("Tickets")
-                        .HasForeignKey("Booking_ID")
+                        .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Core.Entities.Seat", "Seat")
                         .WithMany("Tickets")
-                        .HasForeignKey("Seat_ID")
+                        .HasForeignKey("SeatId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -497,7 +469,7 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Core.Entities.User_Type", "User_Type")
                         .WithMany("Users")
-                        .HasForeignKey("User_TypeID_Type")
+                        .HasForeignKey("TypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

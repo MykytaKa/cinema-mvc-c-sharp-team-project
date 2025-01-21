@@ -22,6 +22,7 @@ namespace Infrastructure.Data
         public DbSet<Hall> Halls { get; set; }
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Film> Films { get; set; }
+        public DbSet<Actor> Actors { get; set; }
         public DbSet<Booking> Bookings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

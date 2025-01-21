@@ -19,11 +19,9 @@ namespace Infrastructure.Data
         public DbSet<Status> Status { get; set; }
         public DbSet<Session> Sessions { get; set; }
         public DbSet<Seat> Seats { get; set; }
-        public DbSet<Region> Regions { get; set; }
         public DbSet<Hall> Halls { get; set; }
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Film> Films { get; set; }
-        public DbSet<Cinema> Cinemas { get; set; }
         public DbSet<Booking> Bookings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

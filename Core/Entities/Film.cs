@@ -23,11 +23,7 @@ namespace Core.Entities
         public TimeSpan Duration_Of_The_Movie { get; set; }
         public string Age_Rating { get; set; }
         public string Director { get; set; }
-
-        public int GenreId { get; set; }
-        [ForeignKey("GenreId")]
-        public Genre Genre { get; set; }
-
+        public ICollection<Genre> Genres { get; set; }
         public ICollection<Session> Sessions { get; set; }
     }
 }

@@ -17,7 +17,7 @@ namespace Core.Entities
         public string PosterURL { get; set; }
         public string TrailerURL { get; set; }
         public string Description { get; set; }
-        public string Actors { get; set; }
+        public ICollection<Actor> Actors { get; set; }
         public decimal Rating { get; set; }
         public DateTime Release_Date { get; set; }
         public TimeSpan Duration_Of_The_Movie { get; set; }

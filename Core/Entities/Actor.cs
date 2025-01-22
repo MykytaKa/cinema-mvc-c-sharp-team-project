@@ -8,14 +8,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Entities
 {
-    public class Hall
+    public class Actor
     {
         [Key]
         public int Id { get; set; }
 
-        public string Name { get; set; }
-        public int Number_Of_Seats { get; set; }
-        public ICollection<Seat> Seats { get; set; }
-        public ICollection<Session> Sessions { get; set; }
+        [Required]
+        public string FirstName { get; set; }
+
+        [Required]
+        public string LastName { get; set; }
+
+        public ICollection<Film> Films { get; set; }
     }
 }

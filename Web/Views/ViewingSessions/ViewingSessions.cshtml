@@ -1,0 +1,75 @@
+﻿@* @model *@
+
+<h1>Viewing Sessions</h1>
+<table id="example" class="display" style="width:100%">
+    <thead>
+    <tr>
+        <th>№</th>
+        <th>Ім'я</th>
+        <th>Електронна пошта</th>
+        <th>Роль</th>
+    </tr>
+    <tr>
+        <th></th>
+        <th><input type="text" placeholder="Фільтр за ім'ям" /></th>
+        <th><input type="text" placeholder="Фільтр за email" /></th>
+        <th>
+            <select>
+                <option value="">Всі</option>
+                <option value="Адмін">Адмін</option>
+                <option value="Користувач">Користувач</option>
+            </select>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    @* @foreach (var item in Model.Users) *@
+    @* { *@
+    @*     <tr> *@
+    @*         <td>@item.Id</td> *@
+    @*         <td>@item.Name</td> *@
+    @*         <td>@item.Email</td> *@
+    @*         <td>@item.Role</td> *@
+    @*     </tr> *@
+    @* } *@
+    </tbody>
+</table>
+
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            // Ініціалізація DataTable
+            var table = $('#example').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "language": {
+                    "search": "Пошук:",
+                    "lengthMenu": "Показати _MENU_ записів",
+                    "info": "Показано _START_ до _END_ з _TOTAL_ записів",
+                    "paginate": {
+                        "next": "Наступна",
+                        "previous": "Попередня"
+                    }
+                }
+            });
+
+            // Фільтри для текстових полів
+            $('#example thead input').on('keyup change', function () {
+                let colIndex = $(this).parent().index(); // Індекс колонки
+                table.column(colIndex).search(this.value).draw();
+            });
+
+            // Фільтри для випадаючих списків
+            $('#example thead select').on('change', function () {
+                let colIndex = $(this).parent().index(); // Індекс колонки
+                table.column(colIndex).search(this.value).draw();
+            });
+        });
+    </script>
+
+}
+
+

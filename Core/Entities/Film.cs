@@ -13,15 +13,15 @@ namespace Core.Entities
         [Key]
         public int Id { get; set; }
 
-        public string Film_Name { get; set; }
+        public string Name { get; set; }
         public string PosterURL { get; set; }
         public string TrailerURL { get; set; }
         public string Description { get; set; }
         public ICollection<Actor> Actors { get; set; }
         public decimal Rating { get; set; }
-        public DateTime Release_Date { get; set; }
-        public TimeSpan Duration_Of_The_Movie { get; set; }
-        public string Age_Rating { get; set; }
+        public DateTime ReleaseRate { get; set; }
+        public TimeSpan Duration { get; set; }
+        public string AgeRating { get; set; }
         public string Director { get; set; }
         public ICollection<Genre> Genres { get; set; }
         public ICollection<Session> Sessions { get; set; }

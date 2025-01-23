@@ -13,8 +13,8 @@ namespace Core.Entities
         [Key]
         public int Id { get; set; }
 
-        public DateTime Date_Time_Beg { get; set; }
-        public DateTime Date_Time_End { get; set; }
+        public DateTime DateTimeBeg { get; set; }
+        public DateTime DateTimeEnd { get; set; }
         public decimal Price { get; set; }
 
         public int FilmId { get; set; }

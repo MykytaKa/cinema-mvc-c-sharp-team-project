@@ -13,7 +13,7 @@ namespace Core.Entities
         [Key]
         public int Id { get; set; }
 
-        public DateTime Date_Time { get; set; }
+        public DateTime DateTime { get; set; }
         public decimal Price { get; set; }
 
         public int UserId { get; set; }

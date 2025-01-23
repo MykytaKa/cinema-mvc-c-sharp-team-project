@@ -14,7 +14,7 @@ namespace Core.Entities
         public int Id { get; set; }
 
         public string Name { get; set; }
-        public int Number_Of_Seats { get; set; }
+        public int NumberOfSeats { get; set; }
         public ICollection<Seat> Seats { get; set; }
         public ICollection<Session> Sessions { get; set; }
     }

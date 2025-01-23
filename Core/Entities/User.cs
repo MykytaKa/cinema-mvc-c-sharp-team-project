@@ -13,16 +13,16 @@ namespace Core.Entities
         [Key]
         public int Id { get; set; }
 
-        public string First_Name { get; set; }
-        public string Last_Name { get; set; }
-        public string Phone_Number { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string PhoneNumber { get; set; }
         public string Email { get; set; }
-        public string Hash_Password { get; set; }
-        public DateTime Date_Of_Birthday { get; set; }
+        public string HashPassword { get; set; }
+        public DateTime DateOfBirthday { get; set; }
 
         public int TypeId { get; set; }
         [ForeignKey("TypeId")]
-        public User_Type User_Type { get; set; }
+        public User_Type UserType { get; set; }
 
         public ICollection<Booking> Bookings { get; set; }
     }

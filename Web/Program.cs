@@ -1,4 +1,6 @@
+using Core.Interfaces;
 using Infrastructure.Data;
+using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     })
 );
 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

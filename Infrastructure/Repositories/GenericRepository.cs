@@ -53,6 +53,7 @@ namespace Infrastructure.Repositories
         {
             return await _dbSet.ToListAsync();
         }
+        
 
         public virtual async Task InsertAsync(TEntity entity)
         {

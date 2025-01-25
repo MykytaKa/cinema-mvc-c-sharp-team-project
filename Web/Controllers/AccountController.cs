@@ -138,8 +138,8 @@ namespace Web.Controllers
                 TypeId = 1
             };
 
-            await userRepository.AddAsync(user);
-            _unitOfWork.Save();
+            await userRepository.InsertAsync(user);
+            _unitOfWork.SaveAsync();
         }
 
         private void SetAuthToken(User user)

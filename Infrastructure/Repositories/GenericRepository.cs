@@ -17,7 +17,7 @@ namespace Infrastructure.Repositories
             _dbSet = context.Set<TEntity>();
         }
 
-        public virtual IEnumerable<TEntity> Get(
+        public virtual async Task<IEnumerable<TEntity>> GetAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "")
@@ -29,44 +29,46 @@ namespace Infrastructure.Repositories
                 query = query.Where(filter);
             }
 
-            foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(includeProperty);
             }
 
             if (orderBy != null)
             {
-                return orderBy(query).ToList();
+                return await orderBy(query).ToListAsync();
             }
             else
             {
-                return query.ToList();
+                return await query.ToListAsync();
             }
         }
 
-        public virtual TEntity GetByID(object id)
+        public virtual async Task<TEntity> GetByIDAsync(object id)
         {
-            return _dbSet.Find(id);
+            return await _dbSet.FindAsync(id);
         }
 
-        public virtual IEnumerable<TEntity> GetAll()
+        public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
-            return _dbSet.ToList();
+            return await _dbSet.ToListAsync();
         }
 
-        public virtual void Insert(TEntity entity)
+        public virtual async Task InsertAsync(TEntity entity)
         {
-            _dbSet.Add(entity);
+            await _dbSet.AddAsync(entity);
         }
 
-        public virtual void Delete(object id)
+        public virtual async Task DeleteAsync(object id)
         {
-            TEntity entityToDelete = _dbSet.Find(id);
-            Delete(entityToDelete);
+            var entityToDelete = await _dbSet.FindAsync(id);
+            if (entityToDelete != null)
+            {
+               await DeleteAsync(entityToDelete);
+            }
         }
 
-        public virtual void Delete(TEntity entityToDelete)
+        public virtual async Task DeleteAsync(TEntity entityToDelete)
         {
             if (_context.Entry(entityToDelete).State == EntityState.Detached)
             {
@@ -75,7 +77,7 @@ namespace Infrastructure.Repositories
             _dbSet.Remove(entityToDelete);
         }
 
-        public virtual void Update(TEntity entityToUpdate)
+        public virtual async Task UpdateAsync(TEntity entityToUpdate)
         {
             _dbSet.Attach(entityToUpdate);
             _context.Entry(entityToUpdate).State = EntityState.Modified;

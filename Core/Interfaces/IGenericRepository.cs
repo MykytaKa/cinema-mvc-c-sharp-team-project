@@ -10,19 +10,24 @@ namespace Core.Interfaces
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     {
-        IEnumerable<TEntity> Get(
+        Task<IEnumerable<TEntity>> GetAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "");
-        TEntity GetByID(object id);
-        IEnumerable<TEntity> GetAll();
-        void Insert(TEntity entity);
-        void Update(TEntity entity);
-        void Delete(object id);
-        void Delete(TEntity entity);
-        Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> filter = null);
-        Task AddAsync(TEntity entity);
-        // Інші методи (Update, Delete тощо)
+
+
+        Task<TEntity> GetByIDAsync(object id);
+
+        Task<IEnumerable<TEntity>> GetAllAsync();
+
+        Task InsertAsync(TEntity entity);
+
+        Task UpdateAsync(TEntity entity);
+
+        Task DeleteAsync(object id);
+
+        Task DeleteAsync(TEntity entity);
+
     }
 
 }

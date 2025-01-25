@@ -20,5 +20,9 @@ namespace Core.Interfaces
         void Update(TEntity entity);
         void Delete(object id);
         void Delete(TEntity entity);
+        Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> filter = null);
+        Task AddAsync(TEntity entity);
+        // Інші методи (Update, Delete тощо)
     }
+
 }

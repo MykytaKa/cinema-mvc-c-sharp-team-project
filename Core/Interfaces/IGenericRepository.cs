@@ -15,7 +15,14 @@ namespace Core.Interfaces
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "");
 
-
+       TEntity GetByID(object id);
+       IEnumerable<TEntity> GetAll();
+       void Insert(TEntity entity);
+       void Update(TEntity entity);
+       void Delete(object id);
+       void Delete(TEntity entity);
+       Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> filter = null);
+       Task AddAsync(TEntity entity);
         Task<TEntity> GetByIDAsync(object id);
 
         Task<IEnumerable<TEntity>> GetAllAsync();

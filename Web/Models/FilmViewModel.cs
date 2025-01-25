@@ -41,12 +41,14 @@ namespace Web.Models
         [StringLength(50, ErrorMessage = "Director name cannot exceed 50 characters.")]
         public string Director { get; set; }
 
-        // Lists for selected Actor IDs and Genre IDs
         public List<int> SelectedActorIds { get; set; } = new List<int>();
         public List<int> SelectedGenreIds { get; set; } = new List<int>();
 
-        // Lists for all available Actors and Genres
         public List<Actor> AllActors { get; set; } = new List<Actor>();
         public List<Genre> AllGenres { get; set; } = new List<Genre>();
+        public List<Film> AllFilms { get; set; } = new List<Film>();
+
+        public int CurrentPage { get; set; }
+        public int TotalPages { get; set; }
     }
 }

@@ -8,46 +8,56 @@
         <input asp-for="Name" class="form-control" />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
+
     <div class="mb-3">
         <label asp-for="PosterURL" class="form-label"></label>
         <input asp-for="PosterURL" class="form-control" />
         <span asp-validation-for="PosterURL" class="text-danger"></span>
     </div>
+
     <div class="mb-3">
         <label asp-for="TrailerURL" class="form-label"></label>
         <input asp-for="TrailerURL" class="form-control" />
         <span asp-validation-for="TrailerURL" class="text-danger"></span>
     </div>
+
     <div class="mb-3">
         <label asp-for="Description" class="form-label"></label>
         <textarea asp-for="Description" class="form-control"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
+
     <div class="mb-3">
         <label asp-for="Rating" class="form-label"></label>
-        <input asp-for="Rating" class="form-control" type="number" step="0.1" />
+        <input asp-for="Rating" class="form-control" type="number" step="0.1" min="0" max="10" />
         <span asp-validation-for="Rating" class="text-danger"></span>
     </div>
+
     <div class="mb-3">
         <label asp-for="ReleaseRate" class="form-label"></label>
         <input asp-for="ReleaseRate" class="form-control" type="date" />
         <span asp-validation-for="ReleaseRate" class="text-danger"></span>
     </div>
+
     <div class="mb-3">
         <label asp-for="Duration" class="form-label"></label>
         <input asp-for="Duration" class="form-control" placeholder="HH:MM" />
         <span asp-validation-for="Duration" class="text-danger"></span>
     </div>
+
     <div class="mb-3">
         <label asp-for="AgeRating" class="form-label"></label>
         <input asp-for="AgeRating" class="form-control" />
         <span asp-validation-for="AgeRating" class="text-danger"></span>
     </div>
+
     <div class="mb-3">
         <label asp-for="Director" class="form-label"></label>
         <input asp-for="Director" class="form-control" />
         <span asp-validation-for="Director" class="text-danger"></span>
     </div>
+
+    <!-- Actors Select -->
     <div class="mb-3">
         <label asp-for="SelectedActorIds" class="form-label">Select Actors</label>
         <select asp-for="SelectedActorIds" class="form-control" multiple="multiple">
@@ -58,6 +68,8 @@
         </select>
         <span asp-validation-for="SelectedActorIds" class="text-danger"></span>
     </div>
+
+    <!-- Genres Select -->
     <div class="mb-3">
         <label asp-for="SelectedGenreIds" class="form-label">Select Genres</label>
         <select asp-for="SelectedGenreIds" class="form-control" multiple="multiple">
@@ -68,10 +80,64 @@
         </select>
         <span asp-validation-for="SelectedGenreIds" class="text-danger"></span>
     </div>
-
     <button type="submit" class="btn btn-primary">Submit</button>
-</form>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+    <h3>Films List</h3>
+    @if (Model.AllFilms.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Director</th>
+                    <th>Release Date</th>
+                    <th>Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var film in Model.AllFilms)
+                {
+                    <tr>
+                        <td>@film.Name</td>
+                        <td>@film.Director</td>
+                        <td>@film.ReleaseRate.ToShortDateString()</td>
+                        <td>@film.Rating</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <nav aria-label="Films Pagination">
+            <ul class="pagination">
+                @if (Model.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="AddFilm" asp-route-page="@(Model.CurrentPage - 1)">Previous</a>
+                    </li>
+                }
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-action="AddFilm" asp-route-page="@i">@i</a>
+                    </li>
+                }
+
+                @if (Model.CurrentPage < Model.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="AddFilm" asp-route-page="@(Model.CurrentPage + 1)">Next</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+    else
+    {
+        <p>No films available in the database.</p>
+    }
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</form>

@@ -22,19 +22,46 @@ namespace Web.Controllers
             return View();
         }
 
-        public IActionResult AddActor()
+        public IActionResult AddActor(int page = 1, int pageSize = 10)
         {
-            return View();
+            var model = new ActorViewModel();
+
+            var allActors = _unitOfWork.Repository<Actor>().GetAllAsync().Result.ToList();
+
+            // Вираховуємо кількість сторінок
+            int totalActors = allActors.Count;
+            model.TotalPages = (int)Math.Ceiling(totalActors / (double)pageSize);
+            model.CurrentPage = page;
+
+            model.AllActors = allActors
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return View(model);
         }
 
-        public async Task<IActionResult> AddFilm()
+
+
+        public async Task<IActionResult> AddFilm(int page = 1, int pageSize = 10)
         {
             var model = new FilmViewModel();
-            var actors = await _unitOfWork.Repository<Actor>().GetAllAsync();
-            var genres = await _unitOfWork.Repository<Genre>().GetAllAsync();
 
-            model.AllActors = actors.ToList();
-            model.AllGenres = genres.ToList();
+            var allFilms = await _unitOfWork.Repository<Film>().GetAllAsync();
+            var allActors = await _unitOfWork.Repository<Actor>().GetAllAsync();
+            var allGenres = await _unitOfWork.Repository<Genre>().GetAllAsync();
+
+            model.AllActors = allActors.ToList();
+            model.AllGenres = allGenres.ToList();
+
+            int totalFilms = allFilms.Count();
+            model.TotalPages = (int)Math.Ceiling(totalFilms / (double)pageSize);
+            model.CurrentPage = page;
+
+            model.AllFilms = allFilms
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
             return View(model);
         }

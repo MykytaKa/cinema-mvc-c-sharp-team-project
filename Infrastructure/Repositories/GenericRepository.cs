@@ -3,10 +3,11 @@ using Infrastructure.Data;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Core.Interfaces;
+using System.Linq;
 
 namespace Infrastructure.Repositories
 {
-    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class 
+    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
         internal ApplicationDbContext _context;
         internal DbSet<TEntity> _dbSet;
@@ -49,9 +50,16 @@ namespace Infrastructure.Repositories
             return await _dbSet.FindAsync(id);
         }
 
-        public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
+        public virtual async Task<IEnumerable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> include = null)
         {
-            return await _dbSet.ToListAsync();
+            IQueryable<TEntity> query = _dbSet;
+
+            if (include != null)
+            {
+                query = include(query);
+            }
+
+            return await query.ToListAsync();
         }
 
         public virtual async Task InsertAsync(TEntity entity)
@@ -59,12 +67,17 @@ namespace Infrastructure.Repositories
             await _dbSet.AddAsync(entity);
         }
 
+        public virtual async Task InsertRangeAsync(IEnumerable<TEntity> entities)
+        {
+            await _dbSet.AddRangeAsync(entities);
+        }
+
         public virtual async Task DeleteAsync(object id)
         {
             var entityToDelete = await _dbSet.FindAsync(id);
             if (entityToDelete != null)
             {
-               await DeleteAsync(entityToDelete);
+                await DeleteAsync(entityToDelete);
             }
         }
 
@@ -82,13 +95,14 @@ namespace Infrastructure.Repositories
             _dbSet.Attach(entityToUpdate);
             _context.Entry(entityToUpdate).State = EntityState.Modified;
         }
+
         public async Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> filter = null)
         {
             IQueryable<TEntity> query = _dbSet;
 
             if (filter != null)
             {
-                query = query.Where(filter); // Тут важливо: filter має бути строго типізованим
+                query = query.Where(filter);
             }
 
             return await query.ToListAsync();
@@ -98,6 +112,5 @@ namespace Infrastructure.Repositories
         {
             await _dbSet.AddAsync(entity);
         }
-
     }
 }

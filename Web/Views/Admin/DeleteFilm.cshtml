@@ -1,0 +1,45 @@
+﻿@model FilmViewModel
+
+<h2>Delete Film</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Year</th>
+            <th>Genre</th>
+            <th>Actions</th>
+            <th>AgeRating</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var film in Model.AllFilms)
+        {
+            <tr>
+                <td>@film.Name</td>
+                <td>@film.ReleaseRate.ToShortDateString()</td> 
+                <td>@film.Director</td>
+                <td>@film.AgeRating</td>
+                <td>
+                    <form asp-action="DeleteFilmById" method="post" style="display:inline;">
+                        <input type="hidden" name="filmId" value="@film.Id" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <nav>
+        <ul class="pagination">
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="DeleteFilm" asp-route-page="@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>

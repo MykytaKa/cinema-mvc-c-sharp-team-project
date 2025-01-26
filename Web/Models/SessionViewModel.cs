@@ -10,6 +10,7 @@ namespace Web.Models
         public int FilmId { get; set; }
         public int HallId { get; set; }
         public DateTime DateTimeBeg { get; set; }
+        public DateTime DateTimeEnd { get; set; }
         public int NumberOfDays { get; set; }
         public decimal Price { get; set; }
 

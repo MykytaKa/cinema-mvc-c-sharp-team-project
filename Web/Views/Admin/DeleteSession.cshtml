@@ -1,0 +1,47 @@
+﻿@model SessionViewModel
+
+<h2>Delete Session</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Film</th>
+            <th>Hall</th>
+            <th>Begine Date-time</th>
+            <th>End Date-time</th>
+            <th>Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var session in Model.AllSessions)
+        {
+            <tr>
+                <td>@Model.AllFilms.FirstOrDefault(f => f.Id == session.FilmId)?.Name</td>
+                <td>@Model.AllHalls.FirstOrDefault(h => h.Id == session.HallId)?.Name</td>
+                <td>@session.DateTimeBeg.ToString("dd.MM.yyyy HH:mm")</td> 
+                <td>@session.DateTimeEnd.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>@session.Price</td>
+                <td>
+                    <form asp-action="DeleteSessionById" method="post" style="display:inline;">
+                        <input type="hidden" name="sessionId" value="@session.Id" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <nav>
+        <ul class="pagination">
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="DeleteSession" asp-route-page="@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>

@@ -1,0 +1,88 @@
+﻿@model Web.Models.SessionViewModel
+
+<h2>Add Sessions</h2>
+
+<form id="sessionForm" method="post" asp-action="AddSessionToDB">
+    <div class="form-group">
+        <label for="FilmId">Film</label>
+        <select id="FilmId" name="FilmId" class="form-control" required>
+            @foreach (var film in Model.AllFilms)
+            {
+                <option value="@film.Id">@film.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="HallId">Hall</label>
+        <select id="HallId" name="HallId" class="form-control" required>
+            @foreach (var hall in Model.AllHalls)
+            {
+                <option value="@hall.Id">@hall.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="DateTimeBeg">Start Time</label>
+        <input type="datetime-local" id="DateTimeBeg" name="DateTimeBeg" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label for="NumberOfDays">Number of Days</label>
+        <input type="number" id="NumberOfDays" name="NumberOfDays" class="form-control" required min="1" />
+    </div>
+
+    <div class="form-group">
+        <label for="Price">Price</label>
+        <input type="number" id="Price" name="Price" class="form-control" required step="0.01" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Sessions</button>
+</form>
+<h2>Existing Sessions</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Film</th>
+            <th>Hall</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var session in Model.AllSessions)
+        {
+            <tr>
+                <td>@session.Film.Name</td>
+                <td>@session.Hall.Name</td>
+                <td>@session.DateTimeBeg</td>
+                <td>@session.DateTimeEnd</td>
+                <td>@session.Price</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                <a class="page-link" asp-action="AddSession" asp-route-page="@i">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}

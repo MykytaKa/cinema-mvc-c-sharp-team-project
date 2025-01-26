@@ -22,7 +22,7 @@ namespace Core.Entities
         public Film Film { get; set; }
 
         public int HallId { get; set; }
-        [ForeignKey("FilmId")]
+        [ForeignKey("HallId")]
         public Hall Hall { get; set; }
 
         public ICollection<Booking> Bookings { get; set; }

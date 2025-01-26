@@ -17,9 +17,11 @@ namespace Core.Interfaces
 
         Task<TEntity> GetByIDAsync(object id);
 
-        Task<IEnumerable<TEntity>> GetAllAsync();
+        Task<IEnumerable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> include = null);
 
         Task InsertAsync(TEntity entity);
+
+        Task InsertRangeAsync(IEnumerable<TEntity> entities);
 
         Task UpdateAsync(TEntity entity);
 

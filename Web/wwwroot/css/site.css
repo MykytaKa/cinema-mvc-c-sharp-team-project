@@ -20,8 +20,3 @@ html {
 body {
   margin-bottom: 60px;
 }
-
-.card img{
-  height: 450px;
-  object-fit: contain;
-}

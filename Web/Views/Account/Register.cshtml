@@ -1,0 +1,54 @@
+﻿@model Application.DTOs.RegisterUserDto
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Registration</h2>
+    <form id="registerForm" method="post" asp-action="Register">
+        <div class="form-group">
+            <label for="FirstName">Name:</label>
+            <input asp-for="FirstName" class="form-control" id="FirstName" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="LastName">Surname:</label>
+            <input asp-for="LastName" class="form-control" id="LastName" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="Email">Email:</label>
+            <input asp-for="Email" class="form-control" id="Email" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="PhoneNumber">Phone Number:</label>
+            <input asp-for="PhoneNumber" class="form-control" id="PhoneNumber" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="Password">Password:</label>
+            <input asp-for="Password" type="password" class="form-control" id="Password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="ConfirmPassword">Confirm Password:</label>
+            <input asp-for="ConfirmPassword" type="password" class="form-control" id="ConfirmPassword" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="DateOfBirth">Date of Birth:</label>
+            <input asp-for="DateOfBirth" type="date" class="form-control" id="DateOfBirth" />
+            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success mt-3">Register</button>
+    </form>
+</div>
+
+@section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+}

@@ -29,6 +29,31 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="ViewingSessions" asp-action="ViewingSessions">Сеанси</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Admin">Admin</a>
+                        </li>
+                    </ul>
+                            
+                    <!-- Додаткове меню справа -->
+                    <ul class="navbar-nav ml-auto">
+                        @if (Context.Request.Cookies["AuthToken"] != null)
+                         {
+                    <!-- Кнопка Logout -->
+                     <li class="nav-item">
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="btt-login">
+                            <button type="submit" class="btt-login">LogOut</button>
+                        </form>
+                     </li>
+                        }
+                        else
+                        {
+                        <li class="nav-item">
+                            <a class="transparent-button" asp-area="" asp-controller="Account" asp-action="Register">Registration</a>
+                        </li>
+                        <li class="nav-item">
+                <a class="btt-login" asp-controller="Account" asp-action="Login">Login</a>
+                        </li>
+                        }
                     </ul>
                 </div>
             </div>
@@ -47,10 +72,14 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.2.1/js/dataTables.min.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 </body>
 </html>

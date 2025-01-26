@@ -1,0 +1,84 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <div class="d-flex justify-content-center flex-wrap gap-3">
+        <!--Create Card-->
+        <div class="card d-flex align-items-center justify-content-center" style="width: 18rem; background-color: #f8f9fa;">
+            <div class="card-body text-center">
+                <h5 class="card-title">Add</h5>
+                <p class="card-text">Add new Film, Actor</p>
+            </div>
+            <div class="card-body text-center">
+                <h5 class="card-title">Add Film</h5>
+                <p class="card-text">Add new Film into cinema</p>
+                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="AddFilm">Add</a>
+            </div>
+            <div class="card-body text-center">
+                <h5 class="card-title">Add Actor</h5>
+                <p class="card-text">Add new Actor, if they are not in DataBase</p>
+                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="AddActor">Add</a>
+            </div>
+        </div>
+        <!--Session Card-->
+        <div class="card d-flex align-items-center justify-content-center" style="width: 18rem; background-color: #f8f9fa;">
+            <div class="card-body text-center">
+                <h5 class="card-title">Session</h5>
+                <p class="card-text">Create or change Session</p>
+            </div>
+            <div class="card-body text-center">
+                <h5 class="card-title">New Session</h5>
+                <p class="card-text">Create new session in the cinema</p>
+                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="AddSession">Create</a>
+            </div>
+            <div class="card-body text-center">
+                <h5 class="card-title">Change Session</h5>
+                <p class="card-text">Change created Session</p>
+                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="ChangeSession">Change</a>
+            </div>
+        </div>
+        <!--Change Card-->
+        <div class="card d-flex align-items-center justify-content-center" style="width: 18rem; background-color: #f8f9fa;">
+            <div class="card-body text-center">
+                <h5 class="card-title">Change</h5>
+                <p class="card-text">Add changes into Film and Booking</p>
+            </div>
+            <div class="card-body text-center">
+                <h5 class="card-title">Change Film </h5>
+                <p class="card-text">Change information about Film</p>
+                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="ChangeFilm">Change</a>
+            </div>
+            <div class="card-body text-center">
+                <h5 class="card-title">Change Booking status </h5>
+                <p class="card-text">Change information about Booking status</p>
+                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="ChangeBooking">Change</a>
+            </div>
+        </div>
+        <!--Delete Card-->
+        <div class="card d-flex align-items-center justify-content-center" style="width: 18rem; background-color: #f8f9fa;">
+            <div class="card-body text-center">
+                <h5 class="card-title">Delete</h5>
+                <p class="card-text">Delete Film, Session</p>
+            </div>
+            <div class="card-body text-center">
+                <h5 class="card-title">Delete Film </h5>
+                <p class="card-text">Delete Film from DataBase</p>
+                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="ChangeFilm">Delete</a>
+            </div>
+            <div class="card-body text-center">
+                <h5 class="card-title">Delete Session </h5>
+                <p class="card-text">Delete Session from DataBase</p>
+                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="ChangeBooking">Delete</a>
+            </div>
+        </div>
+        <!--Statistc Card-->
+        <div class="card d-flex align-items-center justify-content-center" style="width: 18rem; background-color: #f8f9fa;">
+            <div class="card-body text-center">
+                <h5 class="card-title">Statistc</h5>
+                <p class="card-text">--Statistc--</p>
+                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="ChangeBooking">Statistc</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+﻿@model Application.DTOs.LoginDto
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Login</h2>
+    <form method="post" asp-action="Login">
+        <div class="form-group">
+            <label for="Login">Login (Email or Phone Number):</label>
+            <input asp-for="Login" class="form-control" id="Login" />
+            <span asp-validation-for="Login" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label for="Password">Password:</label>
+            <input asp-for="Password" type="password" class="form-control" id="Password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-success mt-3">Login</button>
+    </form>
+</div>
+@section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+}

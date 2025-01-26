@@ -1,0 +1,85 @@
+﻿@model Web.Models.ActorViewModel
+
+<h2>Add Actor</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- Форма для додавання актора -->
+<form asp-action="AddActorToDB" method="post">
+    <div class="mb-3">
+        <label asp-for="FirstName" class="form-label"></label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="LastName" class="form-label"></label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Actor</button>
+</form>
+
+<!-- Відображення таблиці з акторами -->
+@if (Model.AllActors.Any())
+{
+    <h3>Actors List</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var actor in Model.AllActors)
+            {
+                <tr>
+                    <td>@actor.FirstName</td>
+                    <td>@actor.LastName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Пагінація -->
+    <nav aria-label="Actors Pagination">
+        <ul class="pagination">
+            @if (Model.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="AddActor" asp-route-page="@(Model.CurrentPage - 1)">Previous</a>
+                </li>
+            }
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="AddActor" asp-route-page="@i">@i</a>
+                </li>
+            }
+
+            @if (Model.CurrentPage < Model.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="AddActor" asp-route-page="@(Model.CurrentPage + 1)">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+else
+{
+    <p>No actors available in the database.</p>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

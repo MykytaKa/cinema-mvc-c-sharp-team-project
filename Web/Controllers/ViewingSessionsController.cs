@@ -1,6 +1,4 @@
-﻿
-
-using Core.Entities;
+﻿using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
@@ -14,18 +12,21 @@ public class ViewingSessionsController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    public ViewingSessionsController(IUnitOfWork unitOfWork )
+    public ViewingSessionsController(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
 
     public async Task<IActionResult> ViewingSessions()
     {
-        var repository = _unitOfWork.Repository<Film>();
-        
-        var films = await repository.GetAsync(includeProperties:"Genres");
-        
-        return View(films);
+        var sessions = await _unitOfWork.Repository<Session>()
+            .GetAsync(includeProperties: "Film.Genres,Hall,Bookings");
+
+        var uniqueFilms = sessions
+            .Select(s => s.Film)
+            .Distinct()
+            .ToList();
+
+        return View(uniqueFilms);
     }
-    
 }

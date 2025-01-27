@@ -2,33 +2,66 @@
 
 <div class="container">
     <div class="text-center">
-        <div class="container mt-2 mb-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <h1 class="text-center flex-grow-1">Session</h1>
-                <button type="button" class="btn btn-success">Create Session</button>
-            </div>
-        </div>
-        <div id="moviesContainer" class="row row-cols-1 row-cols-md-3 g-4">
-                @foreach (var movie in Model)
+        <h1 class="text-center flex-grow-1 mb-4">Session</h1>
+
+        <div id="moviesContainer" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var session in Model)
                 {
-                    <div class="col">
-                        <div class="card h-100">
-                            <img class="card-img-top" src="@movie.PosterURL" alt="@movie.Name">
-                            <div class="card-body">
-                                <h5 class="card-title">@movie.Name</h5>
-                                <p class="card-text">
-                                    Жанр: @string.Join(", ", movie.Genres.Select(g => g.Name))<br/>
-                                    Рейтинг: @movie.Rating<br/>
-                                    Тривалість: @movie.Duration хв<br/>
-                                    Віковий рейтинг: @movie.AgeRating<br/>
-                                    Дата виходу: @movie.ReleaseRate.ToString("dd.MM.yyyy")<br/>
-                                    Сеанс: 
-                                </p>
+                    var collapseId = $"collapse-{session.Id}";  // Унікальний ідентифікатор для кожного фільму
+
+                    <div class="col d-flex">
+                        <div class="card h-100 shadow-sm d-flex flex-column">
+                            <img class="card-img-top" src="@session.PosterURL" alt="@session.Name">
+                            <div class="card-body flex-grow-1 d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5 class="card-title text-center">@session.Name</h5>
+                                    <p class="card-text">
+                                        <strong>Genres:</strong> @(session?.Genres != null ? string.Join(", ", session.Genres.Select(g => g.Name)) : "Немає жанрів")<br />
+                                        <strong>Rating:</strong> @(session?.Rating)<br />
+                                        <strong>Duration:</strong> @(session?.Duration) хв<br />
+                                        <strong>Age Rating:</strong> @session?.AgeRating
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-light">
+                                <h6 class="text-center mb-2">Session:</h6>
+                                <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                                    Unhide/Hide Sessions
+                                </button>
+                                <div class="collapse mt-3" id="@collapseId">
+                                    @if (session?.Sessions != null && session.Sessions.Any())
+                                    {
+                                        <ul class="list-group">
+                                            @foreach (var s in session.Sessions)
+                                            {
+                                                <li class="list-group-item">
+                                                    <strong>Beginning:</strong> @s.DateTimeBeg.ToString("dd.MM.yyyy HH:mm")<br />
+                                                    <strong>End:</strong> @s.DateTimeEnd.ToString("HH:mm")<br />
+                                                    <strong>Price:</strong> @s.Price.ToString("0.00") грн<br />
+                                                    <strong>Hall:</strong> @s.Hall.Name
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted text-center">Немає доступних сеансів</p>
+                                    }
+                                </div>
                             </div>
                         </div>
                     </div>
                 }
-            </div>
+            }
+            else
+            {
+                <p class="text-center text-muted">Немає доступних сеансів.</p>
+            }
         </div>
     </div>
+</div>
+
+
 

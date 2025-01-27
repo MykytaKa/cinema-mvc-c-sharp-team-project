@@ -1,20 +1,32 @@
-﻿
-
+﻿using Core.Entities;
+using Core.Interfaces;
+using Infrastructure.Data;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Web.Controllers;
 
 public class ViewingSessionsController : Controller
 {
-    private readonly ILogger<ViewingSessionsController> _logger;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ViewingSessionsController(ILogger<ViewingSessionsController> logger)
+    public ViewingSessionsController(IUnitOfWork unitOfWork)
     {
-        _logger = logger;
+        _unitOfWork = unitOfWork;
     }
 
-    public IActionResult ViewingSessions()
+    public async Task<IActionResult> ViewingSessions()
     {
-        return View();
+        var sessions = await _unitOfWork.Repository<Session>()
+            .GetAsync(includeProperties: "Film.Genres,Hall,Bookings");
+
+        var uniqueFilms = sessions
+            .Select(s => s.Film)
+            .Distinct()
+            .ToList();
+
+        return View(uniqueFilms);
     }
 }

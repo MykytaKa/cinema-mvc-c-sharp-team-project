@@ -20,28 +20,3 @@ html {
 body {
   margin-bottom: 60px;
 }
-.transparent-button {
-    color: black;
-    text-decoration: none; 
-    font-size: 16px;
-    margin: 0 10px; 
-    cursor: pointer; 
-}
-.btt-login {
-    color: black;
-    text-decoration: none;
-    font-size: 16px;
-    margin: 0 10px;
-    cursor: pointer;
-    background: none; /* Прибирає фон кнопки */
-    border: none; /* Прибирає рамку кнопки */
-    padding: 0; /* Прибирає внутрішні відступи */
-}
-
-    .btt-login:focus {
-        outline: none; /* Прибирає рамку під час натискання */
-        box-shadow: none; /* Забирає тінь під час натискання */
-    }
-
-   
-

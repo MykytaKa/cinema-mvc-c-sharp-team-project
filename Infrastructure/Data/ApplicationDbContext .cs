@@ -39,6 +39,16 @@ namespace Infrastructure.Data
                 .WithMany(s => s.Tickets)
                 .HasForeignKey(t => t.SeatId)
                 .OnDelete(DeleteBehavior.Restrict); // Тут вимикаємо каскадне видалення
+            
+            modelBuilder.Entity<Session>()
+                .HasOne(s => s.Film)
+                .WithMany(f => f.Sessions)
+                .HasForeignKey(s => s.FilmId);
+
+            modelBuilder.Entity<Session>()
+                .HasOne(s => s.Hall)
+                .WithMany(h => h.Sessions)
+                .HasForeignKey(s => s.HallId);
 
             // Додаткові конфігурації, якщо необхідно
             base.OnModelCreating(modelBuilder);

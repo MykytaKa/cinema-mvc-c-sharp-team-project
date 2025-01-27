@@ -1,75 +1,67 @@
-﻿@* @model *@
+﻿@model IEnumerable<Core.Entities.Film>
 
-<h1>Viewing Sessions</h1>
-<table id="example" class="display" style="width:100%">
-    <thead>
-    <tr>
-        <th>№</th>
-        <th>Ім'я</th>
-        <th>Електронна пошта</th>
-        <th>Роль</th>
-    </tr>
-    <tr>
-        <th></th>
-        <th><input type="text" placeholder="Фільтр за ім'ям" /></th>
-        <th><input type="text" placeholder="Фільтр за email" /></th>
-        <th>
-            <select>
-                <option value="">Всі</option>
-                <option value="Адмін">Адмін</option>
-                <option value="Користувач">Користувач</option>
-            </select>
-        </th>
-    </tr>
-    </thead>
-    <tbody>
-    @* @foreach (var item in Model.Users) *@
-    @* { *@
-    @*     <tr> *@
-    @*         <td>@item.Id</td> *@
-    @*         <td>@item.Name</td> *@
-    @*         <td>@item.Email</td> *@
-    @*         <td>@item.Role</td> *@
-    @*     </tr> *@
-    @* } *@
-    </tbody>
-</table>
+<div class="container">
+    <div class="text-center">
+        <h1 class="text-center flex-grow-1 mb-4">Session</h1>
 
+        <div id="moviesContainer" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var session in Model)
+                {
+                    var collapseId = $"collapse-{session.Id}";  // Унікальний ідентифікатор для кожного фільму
 
-@section Scripts
-{
-    <script>
-        $(document).ready(function () {
-            // Ініціалізація DataTable
-            var table = $('#example').DataTable({
-                "paging": true,
-                "searching": true,
-                "ordering": true,
-                "language": {
-                    "search": "Пошук:",
-                    "lengthMenu": "Показати _MENU_ записів",
-                    "info": "Показано _START_ до _END_ з _TOTAL_ записів",
-                    "paginate": {
-                        "next": "Наступна",
-                        "previous": "Попередня"
-                    }
+                    <div class="col d-flex">
+                        <div class="card h-100 shadow-sm d-flex flex-column">
+                            <img class="card-img-top" src="@session.PosterURL" alt="@session.Name">
+                            <div class="card-body flex-grow-1 d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5 class="card-title text-center">@session.Name</h5>
+                                    <p class="card-text">
+                                        <strong>Genres:</strong> @(session?.Genres != null ? string.Join(", ", session.Genres.Select(g => g.Name)) : "Немає жанрів")<br />
+                                        <strong>Rating:</strong> @(session?.Rating)<br />
+                                        <strong>Duration:</strong> @(session?.Duration) хв<br />
+                                        <strong>Age Rating:</strong> @session?.AgeRating
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-light">
+                                <h6 class="text-center mb-2">Session:</h6>
+                                <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                                    Unhide/Hide Sessions
+                                </button>
+                                <div class="collapse mt-3" id="@collapseId">
+                                    @if (session?.Sessions != null && session.Sessions.Any())
+                                    {
+                                        <ul class="list-group">
+                                            @foreach (var s in session.Sessions)
+                                            {
+                                                <li class="list-group-item">
+                                                    <strong>Beginning:</strong> @s.DateTimeBeg.ToString("dd.MM.yyyy HH:mm")<br />
+                                                    <strong>End:</strong> @s.DateTimeEnd.ToString("HH:mm")<br />
+                                                    <strong>Price:</strong> @s.Price.ToString("0.00") грн<br />
+                                                    <strong>Hall:</strong> @s.Hall.Name
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted text-center">Немає доступних сеансів</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 }
-            });
+            }
+            else
+            {
+                <p class="text-center text-muted">Немає доступних сеансів.</p>
+            }
+        </div>
+    </div>
+</div>
 
-            // Фільтри для текстових полів
-            $('#example thead input').on('keyup change', function () {
-                let colIndex = $(this).parent().index(); // Індекс колонки
-                table.column(colIndex).search(this.value).draw();
-            });
-
-            // Фільтри для випадаючих списків
-            $('#example thead select').on('change', function () {
-                let colIndex = $(this).parent().index(); // Індекс колонки
-                table.column(colIndex).search(this.value).draw();
-            });
-        });
-    </script>
-
-}
 
 

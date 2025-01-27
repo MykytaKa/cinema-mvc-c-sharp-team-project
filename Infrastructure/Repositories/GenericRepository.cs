@@ -62,6 +62,7 @@ namespace Infrastructure.Repositories
             return await query.ToListAsync();
         }
         
+        
 
         public virtual async Task InsertAsync(TEntity entity)
         {

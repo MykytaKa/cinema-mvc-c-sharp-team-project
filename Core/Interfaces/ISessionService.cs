@@ -1,0 +1,12 @@
+﻿using Core.Entities;
+using Core.FiltersModels;
+
+
+namespace Core.Interfaces;
+
+public interface ISessionService
+{
+    Task<IEnumerable<Session>> GetFilteredSessionsAsync(SessionFilterModel filter);
+    Task<IEnumerable<string>> GetAllGenresAsync();
+    Task<IEnumerable<string>> GetAllAgeRatingsAsync();
+}

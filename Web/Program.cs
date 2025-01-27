@@ -8,6 +8,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,15 +24,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 );
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ISessionService, SessionService>();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Конфігурація HTTP конвеєра запитів
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ HTTP пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // Значення за замовчуванням для HSTS становить 30 днів. Ви можете змінити це для виробничих сценаріїв.
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ HSTS пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 30 пїЅпїЅпїЅ. пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
     app.UseHsts();
 }
 
@@ -48,12 +51,12 @@ app.MapControllerRoute(
 
 app.Run();
 
-// Додаємо FluentValidation
+// пїЅпїЅпїЅпїЅпїЅпїЅ FluentValidation
 builder.Services.AddFluentValidationAutoValidation()
     .AddValidatorsFromAssemblyContaining<RegisterUserValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
 
-// JWT налаштування
+// JWT пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
@@ -76,11 +79,11 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Додайте це для використання аутентифікації
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 builder.Services.AddAuthorization();
 
-app.UseAuthentication(); // Підключаємо аутентифікацію
-app.UseAuthorization();  // Підключаємо авторизацію
+app.UseAuthentication(); // ПіпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+app.UseAuthorization();  // ПіпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 app.Use(async (context, next) =>
 {
     if (!context.User.Identity.IsAuthenticated)

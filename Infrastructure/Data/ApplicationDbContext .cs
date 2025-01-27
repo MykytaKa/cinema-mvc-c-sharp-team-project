@@ -24,9 +24,23 @@ namespace Infrastructure.Data
         public DbSet<Film> Films { get; set; }
         public DbSet<Actor> Actors { get; set; }
         public DbSet<Booking> Bookings { get; set; }
+        public DbSet<FilmSimilarity> FilmSimilarities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Конфігурація каскадного видалення для таблиці FilmSimilarity
+            modelBuilder.Entity<FilmSimilarity>()
+                .HasOne(fs => fs.Film1)
+                .WithMany()
+                .HasForeignKey(fs => fs.Film1Id)
+                .OnDelete(DeleteBehavior.Restrict); // Забороняє каскадне видалення
+
+            modelBuilder.Entity<FilmSimilarity>()
+                .HasOne(fs => fs.Film2)
+                .WithMany()
+                .HasForeignKey(fs => fs.Film2Id)
+                .OnDelete(DeleteBehavior.Restrict); // Забороняє каскадне видалення
+
             // Конфігурація каскадного видалення для таблиці Ticket
             modelBuilder.Entity<Ticket>()
                 .HasOne(t => t.Booking)

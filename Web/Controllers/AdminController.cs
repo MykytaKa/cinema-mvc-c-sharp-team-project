@@ -207,6 +207,43 @@ namespace Web.Controllers
             return RedirectToAction("ChangeSession");
         }
 
+        public async Task<IActionResult> DeleteSession(int page = 1, int pageSize = 10)
+        {
+            var films = await _unitOfWork.Repository<Film>().GetAllAsync();
+            var halls = await _unitOfWork.Repository<Hall>().GetAllAsync();
+            var allSessions = await _unitOfWork.Repository<Session>().GetAllAsync();
+
+            int totalSessions = allSessions.Count();
+            var model = new SessionViewModel
+            {
+                AllFilms = films.ToList(),
+                AllHalls = halls.ToList(),
+                AllSessions = allSessions
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList(),
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling(totalSessions / (double)pageSize)
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteSessionById(int sessionId)
+        {
+            var sessionRepo = _unitOfWork.Repository<Session>();
+            var session = await sessionRepo.GetByIDAsync(sessionId);
+
+            if (session != null)
+            {
+                sessionRepo.DeleteAsync(session);
+                await _unitOfWork.SaveAsync();
+            }
+
+            return RedirectToAction("DeleteSession");
+        }
+
         //Film
 
         public async Task<IActionResult> AddFilm(int page = 1, int pageSize = 10)
@@ -231,6 +268,41 @@ namespace Web.Controllers
 
             return View(model);
         }
+        public async Task <IActionResult> DeleteFilm(int page=1, int pageSize = 10)
+        {
+            var model = new FilmViewModel();
+
+            var allFilms = await _unitOfWork.Repository<Film>().GetAllAsync();
+            var allActors = await _unitOfWork.Repository<Actor>().GetAllAsync();
+            var allGenres = await _unitOfWork.Repository<Genre>().GetAllAsync();
+
+            model.AllActors = allActors.ToList();
+            model.AllGenres = allGenres.ToList();
+
+            int totalFilms = allFilms.Count();
+            model.TotalPages = (int)Math.Ceiling(totalFilms / (double)pageSize);
+            model.CurrentPage = page;
+
+            model.AllFilms = allFilms
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return View(model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteFilmById(int filmId)
+        {
+            var film = await _unitOfWork.Repository<Film>().GetByIDAsync(filmId); // Виправимо це нижче
+            if (film != null)
+            {
+                _unitOfWork.Repository<Film>().DeleteAsync(film);
+                await _unitOfWork.SaveAsync(); // Викликаємо SaveAsync
+            }
+            return RedirectToAction(nameof(DeleteFilm));
+        }
+
+
 
         [HttpPost]
         public async Task<IActionResult> AddFilmToDB([FromForm] FilmViewModel model)

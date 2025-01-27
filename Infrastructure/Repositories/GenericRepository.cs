@@ -45,9 +45,16 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public virtual async Task<TEntity> GetByIDAsync(object id)
+        public virtual async Task<TEntity> GetByIDAsync(object id, string includeProperties = "")
         {
-            return await _dbSet.FindAsync(id);
+            IQueryable<TEntity> query = _dbSet;
+
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            return await query.FirstOrDefaultAsync(entity => EF.Property<object>(entity, "Id").Equals(id));
         }
 
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> include = null)

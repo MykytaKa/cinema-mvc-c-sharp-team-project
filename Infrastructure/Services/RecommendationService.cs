@@ -6,42 +6,51 @@ using System.Threading.Tasks;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Interfaces.Services;
-using Infrastructure.Data;
-using MathNet.Numerics.LinearAlgebra;
+using Microsoft.Extensions.Logging;
 
 
 namespace Infrastructure.Services
 {
     public class RecommendationService : IRecommendationService
     {
+        private readonly ILogger<RecommendationService> _logger;
         private readonly IUnitOfWork _unitOfWork;
 
-        public RecommendationService(IUnitOfWork unitOfWork)
+        public RecommendationService(IUnitOfWork unitOfWork, ILogger<RecommendationService> logger)
         {
+            _logger = logger;
             _unitOfWork = unitOfWork;
         }
 
-        public IEnumerable<Film> GetRecommendations(int userId)
+        public async Task<IEnumerable<Film>> GetRecommendations(int userId)
         {
+            _logger.LogInformation("Fetching recommendations for user with ID {UserId}.", userId);
+
             // 1. Get all films the user has visited
-            var visitedFilms = GetVisitedFilms(userId);
+            _logger.LogInformation("Retrieving films visited by user with ID {UserId}.", userId);
+            var visitedFilms = await GetVisitedFilms(userId);
 
             if (!visitedFilms.Any())
             {
+                _logger.LogInformation("User with ID {UserId} has not visited any films. No recommendations available.", userId);
                 return Enumerable.Empty<Film>();
             }
 
+            _logger.LogInformation("User with ID {UserId} has visited {VisitedFilmCount} films.", userId, visitedFilms.Count());
+
             // 2. Get similarities for the user's films
             var filmIds = visitedFilms.Select(f => f.Id).ToList();
+            _logger.LogInformation("Fetching similarities for visited films with IDs: {FilmIds}.", string.Join(", ", filmIds));
 
-            var similarities = _unitOfWork.Repository<FilmSimilarity>().Get(
+            var similarities = await _unitOfWork.Repository<FilmSimilarity>().GetAsync(
                 filter: fs => filmIds.Contains(fs.Film1Id) || filmIds.Contains(fs.Film2Id),
                 includeProperties: "Film1,Film2"
-            ).ToList();
+            );
 
             // 3. Calculate the average similarity for each candidate film
             var recommendedFilms = new Dictionary<Film, double>();
 
+            _logger.LogInformation("Calculating recommendations based on similarities.");
             foreach (var similarity in similarities)
             {
                 // Determine which film is the candidate
@@ -65,24 +74,32 @@ namespace Infrastructure.Services
             }
 
             // 4. Filter by similarity threshold and return the result
-            const double similarityThreshold = 0.5;
+            const double similarityThreshold = 0.6;
+            _logger.LogInformation("Filtering films with similarity above {SimilarityThreshold}.", similarityThreshold);
 
-            return recommendedFilms
+            var filteredRecommendations = recommendedFilms
                 .Where(r => r.Value >= similarityThreshold)
                 .OrderByDescending(r => r.Value)
                 .Select(r => r.Key)
                 .ToList();
+
+            _logger.LogInformation("Found {RecommendedFilmCount} films above the similarity threshold for user with ID {UserId}.", filteredRecommendations.Count(), userId);
+
+            return filteredRecommendations;
         }
 
-        private IEnumerable<Film> GetVisitedFilms(int userId)
+        private async Task<IEnumerable<Film>> GetVisitedFilms(int userId)
         {
-            var bookings = _unitOfWork.Repository<Booking>().Get(
+            _logger.LogInformation("Retrieving bookings for user with ID {UserId}.", userId);
+            var bookings = await _unitOfWork.Repository<Booking>().GetAsync(
                 filter: b => (b.Status.Name == "Checked-in" || b.Status.Name == "Reserved") && b.UserId == userId,
                 includeProperties: "Session"
             );
 
+            _logger.LogInformation("Found {BookingCount} bookings for user with ID {UserId}.", bookings.Count(), userId);
             return bookings.Select(b => b.Session.Film).Distinct().ToList();
         }
     }
+
 
 }

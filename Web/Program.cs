@@ -8,6 +8,8 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Core.Interfaces.Services;
+using Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 );
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddScoped<IFilmSimilarityUpdateService, FilmSimilarityUpdateService>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

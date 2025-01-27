@@ -4,56 +4,88 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Interfaces.Services
 {
     public class FilmSimilarityUpdateService : IFilmSimilarityUpdateService
     {
+        private readonly ILogger<FilmSimilarityUpdateService> _logger;
         private readonly IUnitOfWork _unitOfWork;
 
-        public FilmSimilarityUpdateService(IUnitOfWork unitOfWork)
+        public FilmSimilarityUpdateService(IUnitOfWork unitOfWork, ILogger<FilmSimilarityUpdateService> logger)
         {
+            _logger = logger;
             _unitOfWork = unitOfWork;
         }
 
         public async Task UpdateSimilaritiesForFilmAsync(int filmId)
         {
+            _logger.LogInformation("Starting similarity update for film with ID {FilmId}.", filmId);
+
             // 1. Get the film from the database along with its genres and actors
-            var film = await _unitOfWork.Repository<Film>().GetByIdAsync(filmId, includeProperties: "Genres,Actors");
+            var film = await _unitOfWork.Repository<Film>().GetByIDAsync(filmId, includeProperties: "Genres,Actors");
 
             if (film == null)
+            {
+                _logger.LogError("Film with ID {FilmId} does not exist.", filmId);
                 throw new ArgumentException($"Film with ID {filmId} does not exist.");
+            }
+
+            _logger.LogInformation("Retrieved film with ID {FilmId}.", filmId);
 
             // 2. Get all other films from the database
+            _logger.LogInformation("Fetching other films from the database.");
             var otherFilms = await _unitOfWork.Repository<Film>().GetAsync(
-                filter: f => f.Id != filmId,
-                includeProperties: "Genres,Actors"
+                filter: f => f.Id != filmId
             );
 
             // 3. Calculate similarities between the new film and the other films
-            var similarities = otherFilms.Select(otherFilm => new FilmSimilarity
+            _logger.LogInformation("Calculating similarities for {FilmCount} films.", otherFilms.Count());
+            var otherFilmsWithGenres = await _unitOfWork.Repository<Film>().GetAllAsync(query => 
+                query.Where(f => f.Id != filmId).Include(f => f.Genres).Include(f => f.Actors));
+
+            var similarities = new List<FilmSimilarity>();
+
+            foreach (var otherFilm in otherFilmsWithGenres)
             {
-                Film1Id = filmId,
-                Film2Id = otherFilm.Id,
-                SimilarityScore = CalculateCosineSimilarity(film, otherFilm)
-            }).ToList();
+                var similarityScore = CalculateCosineSimilarity(film, otherFilm);
+                similarities.Add(new FilmSimilarity
+                {
+                    Film1Id = filmId,
+                    Film2Id = otherFilm.Id,
+                    SimilarityScore = similarityScore
+                });
+            }
 
             // 4. Remove old similarity records for this film
+            _logger.LogInformation("Fetching existing similarities for film with ID {FilmId}.", filmId);
             var existingSimilarities = await _unitOfWork.Repository<FilmSimilarity>().GetAsync(
                 filter: fs => fs.Film1Id == filmId || fs.Film2Id == filmId
             );
 
-            await _unitOfWork.Repository<FilmSimilarity>().DeleteRangeAsync(existingSimilarities);
+            _logger.LogInformation("Found {ExistingSimilarityCount} existing similarities.", existingSimilarities.Count());
+            foreach (var similarity in existingSimilarities)
+            {
+                await _unitOfWork.Repository<FilmSimilarity>().DeleteAsync(similarity);
+            }
 
             // 5. Add new similarity records
-            await _unitOfWork.Repository<FilmSimilarity>().AddRangeAsync(similarities);
+            _logger.LogInformation("Inserting {NewSimilarityCount} new similarities.", similarities.Count());
+            await _unitOfWork.Repository<FilmSimilarity>().InsertRangeAsync(similarities);
 
             // 6. Save the changes
+            _logger.LogInformation("Saving changes to the database.");
             await _unitOfWork.SaveAsync();
+
+            _logger.LogInformation("Film similarity update for film with ID {FilmId} completed successfully.", filmId);
         }
 
         private double CalculateCosineSimilarity(Film film1, Film film2)
         {
+            _logger.LogDebug("Calculating cosine similarity between film ID {Film1Id} and film ID {Film2Id}.", film1.Id, film2.Id);
+
             var genres1 = film1.Genres.Select(g => g.Id).ToHashSet();
             var genres2 = film2.Genres.Select(g => g.Id).ToHashSet();
 
@@ -68,10 +100,16 @@ namespace Core.Interfaces.Services
             var norm1 = Math.Sqrt(genres1.Count + actors1.Count);
             var norm2 = Math.Sqrt(genres2.Count + actors2.Count);
 
-            if (norm1 == 0 || norm2 == 0) return 0;
+            if (norm1 == 0 || norm2 == 0)
+            {
+                _logger.LogWarning("One or both films have no genres or actors, returning 0 similarity.");
+                return 0;
+            }
 
-            return (intersectionGenres + intersectionActors) / (norm1 * norm2);
+            var similarity = (intersectionGenres + intersectionActors) / (norm1 * norm2);
+            _logger.LogDebug("Calculated similarity score: {SimilarityScore}.", similarity);
+
+            return similarity;
         }
     }
-
 }

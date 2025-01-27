@@ -9,6 +9,6 @@ namespace Core.Interfaces.Services
 {
     public interface IRecommendationService
     {
-        IEnumerable<Film> GetRecommendations(int userId);
+        Task<IEnumerable<Film>> GetRecommendations(int userId);
     }
 }

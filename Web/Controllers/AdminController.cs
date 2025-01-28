@@ -11,6 +11,7 @@ namespace Web.Controllers
     {
         private readonly ILogger<AdminController> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly string _apiKey = "c8a260e94876a3a04f0317efa68269ac";
 
         public AdminController(ILogger<AdminController> logger, IUnitOfWork unitOfWork)
         {
@@ -22,8 +23,6 @@ namespace Web.Controllers
         {
             return View();
         }
-
-
 
         //Session 
 
@@ -268,6 +267,7 @@ namespace Web.Controllers
 
             return View(model);
         }
+
         public async Task <IActionResult> DeleteFilm(int page=1, int pageSize = 10)
         {
             var model = new FilmViewModel();
@@ -290,31 +290,81 @@ namespace Web.Controllers
 
             return View(model);
         }
+
         [HttpPost]
         public async Task<IActionResult> DeleteFilmById(int filmId)
         {
-            var film = await _unitOfWork.Repository<Film>().GetByIDAsync(filmId); // Виправимо це нижче
+            var film = await _unitOfWork.Repository<Film>().GetByIDAsync(filmId);
             if (film != null)
             {
                 _unitOfWork.Repository<Film>().DeleteAsync(film);
-                await _unitOfWork.SaveAsync(); // Викликаємо SaveAsync
+                await _unitOfWork.SaveAsync();
             }
             return RedirectToAction(nameof(DeleteFilm));
         }
 
-
-
         [HttpPost]
-        public async Task<IActionResult> AddFilmToDB([FromForm] FilmViewModel model)
+        public async Task<IActionResult> AddFilmToDB([FromBody] FilmViewModel model)
         {
-            if (!ModelState.IsValid)
+          
+            if (model == null)
             {
-                model.AllActors = (await _unitOfWork.Repository<Actor>().GetAllAsync()).ToList();
-                model.AllGenres = (await _unitOfWork.Repository<Genre>().GetAllAsync()).ToList();
-                return View("AddFilm", model);
+                return BadRequest("Invalid data.");
             }
 
-            var film = new Film
+        
+            var durationString = model.Duration; 
+            var duration = ConvertDurationToTimeSpan(durationString); 
+
+      
+            var actorEntities = new List<Actor>();
+            foreach (var actorName in model.Actors.Split(','))
+            {
+                var actor = actorName.Trim();
+                var nameParts = actor.Split(' ');
+
+                string firstName = nameParts[0];
+                string lastName = nameParts.Length > 1 ? string.Join(" ", nameParts.Skip(1)) : string.Empty;
+
+                var existingActor = await _unitOfWork.Repository<Actor>()
+                    .GetFirstOrDefaultAsync(a => a.FirstName == firstName && a.LastName == lastName);
+
+                if (existingActor == null)
+                {
+                    var newActor = new Actor
+                    {
+                        FirstName = firstName,
+                        LastName = lastName
+                    };
+                    await _unitOfWork.Repository<Actor>().InsertAsync(newActor);
+                    actorEntities.Add(newActor);
+                }
+                else
+                {
+                    actorEntities.Add(existingActor);
+                }
+            }
+
+            var genreEntities = new List<Genre>();
+            foreach (var genreName in model.Genres.Split(','))
+            {
+                var genre = genreName.Trim();
+                var existingGenre = await _unitOfWork.Repository<Genre>()
+                    .GetFirstOrDefaultAsync(g => g.Name == genre);
+
+                if (existingGenre == null)
+                {
+                    var newGenre = new Genre { Name = genre };
+                    await _unitOfWork.Repository<Genre>().InsertAsync(newGenre);
+                    genreEntities.Add(newGenre);
+                }
+                else
+                {
+                    genreEntities.Add(existingGenre);
+                }
+            }
+
+            var filmEntity = new Film
             {
                 Name = model.Name,
                 PosterURL = model.PosterURL,
@@ -322,70 +372,22 @@ namespace Web.Controllers
                 Description = model.Description,
                 Rating = model.Rating,
                 ReleaseRate = model.ReleaseRate,
-                Duration = TimeSpan.Parse(model.Duration),
+                Duration = duration, 
                 AgeRating = model.AgeRating,
                 Director = model.Director,
-                Actors = new List<Actor>(),
-                Genres = new List<Genre>()
+                Actors = actorEntities,
+                Genres = genreEntities
             };
 
-            try
-            {
-                await _unitOfWork.Repository<Film>().InsertAsync(film);
-                await _unitOfWork.SaveAsync();
-                if (model.SelectedActorIds != null && model.SelectedActorIds.Any())
-                {
-                    foreach (var actorId in model.SelectedActorIds)
-                    {
-                        var actor = await _unitOfWork.Repository<Actor>().GetByIDAsync(actorId);
-                        if (actor != null)
-                        {
-                            film.Actors.Add(actor);
-                            _logger.LogInformation("Added actor with ID {Id} to film.", actorId);
-                        }
-                        else
-                        {
-                            _logger.LogWarning("Actor with ID {Id} not found.", actorId);
-                        }
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("No actors selected for the film.");
-                }
-                if (model.SelectedGenreIds != null && model.SelectedGenreIds.Any())
-                {
-                    foreach (var genreId in model.SelectedGenreIds)
-                    {
-                        var genre = await _unitOfWork.Repository<Genre>().GetByIDAsync(genreId);
-                        if (genre != null)
-                        {
-                            film.Genres.Add(genre);
-                            _logger.LogInformation("Added genre with ID {Id} to film.", genreId);
-                        }
-                        else
-                        {
-                            _logger.LogWarning("Genre with ID {Id} not found.", genreId);
-                        }
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("No genres selected for the film.");
-                }
+            await _unitOfWork.Repository<Film>().InsertAsync(filmEntity);
 
-                await _unitOfWork.SaveAsync();
-                TempData["Success"] = "Film successfully added!";
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while adding film to the database");
-                TempData["Error"] = "An error occurred while adding the film. Please try again.";
-            }
+            await _unitOfWork.SaveAsync();
 
-            return RedirectToAction("AddFilm");
+            return Ok(new { message = "Film added successfully!" });
         }
-        
+
+
+
         //Actor
 
         public IActionResult AddActor(int page = 1, int pageSize = 10)
@@ -433,6 +435,15 @@ namespace Web.Controllers
             }
 
             return RedirectToAction("AddActor");
+        }
+        
+
+        //Span
+        private TimeSpan ConvertDurationToTimeSpan(string duration)
+        {
+            var minutes = int.Parse(duration.Replace(" minutes", "").Trim());
+
+            return TimeSpan.FromMinutes(minutes);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

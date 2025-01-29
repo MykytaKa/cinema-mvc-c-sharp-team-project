@@ -2,6 +2,7 @@
 using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using Web.Models;
 
@@ -12,11 +13,13 @@ namespace Web.Controllers
         private readonly ILogger<AdminController> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly string _apiKey = "c8a260e94876a3a04f0317efa68269ac";
+        private readonly IConfiguration _configuration;
 
-        public AdminController(ILogger<AdminController> logger, IUnitOfWork unitOfWork)
+        public AdminController(ILogger<AdminController> logger, IUnitOfWork unitOfWork, IConfiguration configuration)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _configuration = configuration;
         }
 
         public IActionResult Admin()
@@ -446,6 +449,11 @@ namespace Web.Controllers
             return TimeSpan.FromMinutes(minutes);
         }
 
+        public IActionResult GetApiKey()
+        {
+            var apiKey = _configuration["TMDbApiKey"];
+            return Json(new { apiKey });
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

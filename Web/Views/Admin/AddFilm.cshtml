@@ -16,11 +16,25 @@
 
 @section Scripts {
     <script>
+        let apiKey = '';
+
+        async function fetchApiKey() {
+            try {
+                const response = await fetch('/Admin/GetApiKey');
+                const data = await response.json();
+                apiKey = data.apiKey;
+            } catch (error) {
+                console.error('Error fetching API key:', error);
+            }
+        }
         async function searchFilms() {
+            if (!apiKey) {
+                await fetchApiKey();
+            }
+
             const query = document.getElementById('filmSearch').value;
             if (!query) return;
 
-            const apiKey = 'c8a260e94876a3a04f0317efa68269ac';
             const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${query}`;
 
             try {
@@ -36,7 +50,6 @@
                 console.error('Error fetching films:', error);
             }
         }
-
         async function displayFilms(films) {
             const filmResults = document.getElementById('filmResults');
             filmResults.innerHTML = '';
@@ -69,7 +82,7 @@
         }
 
         async function getFilmDetails(movieId) {
-            const apiKey = 'c8a260e94876a3a04f0317efa68269ac';
+            
             const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&append_to_response=videos,release_dates,credits`;
 
             try {

@@ -43,7 +43,9 @@ namespace Web.Controllers
             }
 
             await CreateUserAsync(model, userRepository);
-            SetAuthToken(new User { Email = model.Email });
+
+            var createdUser = await userRepository.GetAsync(u => u.Email == model.Email);
+            SetAuthToken(createdUser.First());
 
             return RedirectToAction("Index", "Home");
         }
@@ -83,11 +85,11 @@ namespace Web.Controllers
         public IActionResult UserProfile()
         {
             var userId = User.FindFirst("UserId")?.Value;
+            var userType = User.FindFirst("UserType")?.Value;
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
-            return View(); // Логіка роботи з профілем користувача
+            return Ok(new { UserId = userId, UserType = userType, Email = email });
         }
 
-        // Допоміжні методи
         private bool ValidateRegistration(RegisterUserDto model)
         {
             if (model.Password.Length < 6)
@@ -135,11 +137,11 @@ namespace Web.Controllers
                 HashPassword = BCrypt.Net.BCrypt.HashPassword(model.Password),
                 DateOfBirthday = model.DateOfBirth,
                 PhoneNumber = model.PhoneNumber,
-                TypeId = 1
+                TypeId = 2
             };
 
             await userRepository.InsertAsync(user);
-            _unitOfWork.SaveAsync();
+            await _unitOfWork.SaveAsync();
         }
 
         private void SetAuthToken(User user)
@@ -159,11 +161,15 @@ namespace Web.Controllers
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+
+            var userType = user.TypeId == 2 ? "User" : "Admin";
+
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("UserId", user.Id.ToString())
+                new Claim("UserId", user.Id.ToString()),
+                new Claim("UserType", userType)
             };
 
             var token = new JwtSecurityToken(

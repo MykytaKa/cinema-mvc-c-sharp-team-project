@@ -22,9 +22,9 @@ namespace Web.Services
         public async Task SendEmailAsync(string to, string subject, string body)
         {
             var client = new SendGridClient(_sendGridApiKey);
-            var from = new EmailAddress(_fromEmail, _fromName);
+            var fromAddress = new EmailAddress(_fromEmail, _fromName);
             var recipient = new EmailAddress(to);
-            var msg = MailHelper.CreateSingleEmail(from, recipient, subject, body, body);
+            var msg = MailHelper.CreateSingleEmail(fromAddress, recipient, subject, body, body);
 
             var response = await client.SendEmailAsync(msg);
 

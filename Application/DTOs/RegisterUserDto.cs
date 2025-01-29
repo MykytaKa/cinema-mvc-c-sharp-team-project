@@ -8,12 +8,12 @@ namespace Application.DTOs
 {
     public class RegisterUserDto
     {
-        public string Email { get; set; } // Email
-        public string Password { get; set; } // Пароль
-        public string ConfirmPassword { get; set; } // Підтвердження пароля
-        public string FirstName { get; set; } // Ім'я
-        public string LastName { get; set; } // Прізвище
-        public DateTime DateOfBirth { get; set; } // Дата народження
+        public string Email { get; set; } 
+        public string Password { get; set; } 
+        public string ConfirmPassword { get; set; } 
+        public string FirstName { get; set; } 
+        public string LastName { get; set; } 
+        public DateTime DateOfBirth { get; set; } 
         public string PhoneNumber { get; set; }
        
     }

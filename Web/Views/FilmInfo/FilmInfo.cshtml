@@ -1,0 +1,16 @@
+@model FilmViewModel
+
+<div class="poster">
+    <img src="@film.PosterURL" />
+</div>
+<div class="details">
+    <h1>Title: @film.Name</h1>
+    <p>Director: @film.Director</p>
+    <p>Age Rating: @film.AgeRating</p>
+    <p>Duration: @film.Duration</p>
+    <p>Genre:</p>
+    <p>Actors: </p>
+    <p>Release Date:@film.ReleaseDate()</p>
+    <p>Rating:@film.Rating /10</p>
+    <p>Description:</p>
+</div>

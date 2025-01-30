@@ -301,12 +301,7 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteFilmById(int filmId)
         {
-            var film = await _unitOfWork.Repository<Film>().GetByIDAsync(filmId);
-            if (film != null)
-            {
-                _unitOfWork.Repository<Film>().DeleteAsync(film);
-                await _unitOfWork.SaveAsync();
-            }
+            await _filmSimilarityUpdateService.DeleteFilmWithSimilaritiesAsync(filmId);
             return RedirectToAction(nameof(DeleteFilm));
         }
 
@@ -387,8 +382,8 @@ namespace Web.Controllers
             };
 
             await _unitOfWork.Repository<Film>().InsertAsync(filmEntity);
-
             await _unitOfWork.SaveAsync();
+            await _filmSimilarityUpdateService.UpdateSimilaritiesForFilmAsync(filmEntity.Id);
 
             return Ok(new { message = "Film added successfully!" });
         }

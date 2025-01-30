@@ -26,6 +26,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IEmailService, SendGridEmailService>(); // Використання SendGridEmailService
 builder.Services.AddControllersWithViews();
 

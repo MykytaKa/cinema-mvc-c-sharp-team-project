@@ -13,9 +13,9 @@ using Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// 🟢 1️⃣ Підключаємо базу даних
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlOptions=>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlOptions =>
     {
         sqlOptions.EnableRetryOnFailure(
             maxRetryCount: 5,
@@ -24,40 +24,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     })
 );
 
+// 🟢 2️⃣ Реєструємо репозиторії та сервіси
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ISessionService, SessionService>();
-builder.Services.AddScoped<IEmailService, SendGridEmailService>(); // Використання SendGridEmailService
-builder.Services.AddControllersWithViews();
+// builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IEmailService, SendGridEmailService>(); 
 
-var app = builder.Build();
-
-// ������������ HTTP ������� ������
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // �������� �� ������������� ��� HSTS ��������� 30 ���. �� ������ ������ �� ��� ���������� �������.
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.Run();
-
-// ������ FluentValidation
+// 🟢 3️⃣ Налаштування FluentValidation
 builder.Services.AddFluentValidationAutoValidation()
     .AddValidatorsFromAssemblyContaining<RegisterUserValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
 
-// JWT ������������
+// 🟢 4️⃣ Налаштування JWT
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
@@ -68,6 +46,8 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -80,10 +60,28 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Додаємо авторизацію
 builder.Services.AddAuthorization();
 
-app.UseAuthentication(); // ϳ�������� ��������������
-app.UseAuthorization();  // ϳ�������� �����������
+// Створюємо `app` після налаштувань
+var app = builder.Build();
+
+// Middleware для обробки помилок
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+// Використовуємо автентифікацію та авторизацію
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+
+app.UseAuthentication(); // 🟢 Обов'язково перед `UseAuthorization()`
+app.UseAuthorization();
+
+// Захищаємо всі запити (неавторизовані користувачі отримають `401 Unauthorized`)
 app.Use(async (context, next) =>
 {
     if (!context.User.Identity.IsAuthenticated)
@@ -91,7 +89,12 @@ app.Use(async (context, next) =>
         context.Response.StatusCode = 401; // Unauthorized
         return;
     }
-
     await next();
 });
 
+// Маршрутизація
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();

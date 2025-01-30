@@ -1,0 +1,86 @@
+﻿using Core.Entities;
+using Core.FiltersModels;
+using Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
+
+namespace Infrastructure.Services;
+
+public class SessionService : ISessionService
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public SessionService(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+    
+    public async Task<IEnumerable<Session>> GetFilteredSessionsAsync(SessionFilterModel filter)
+    {
+        var sessions = await _unitOfWork.Repository<Session>()
+            .GetAsync(includeProperties: "Film.Genres,Hall,Bookings");
+
+        // Фільтрація за датою сеансу
+        if (filter.SessionDate.HasValue)
+        {
+            sessions = sessions.Where(s => s.DateTimeBeg.Date == filter.SessionDate.Value.Date);
+        }
+        
+        // Фільтрація за часом сеансу (опціонально)
+        if (filter.SessionTime.HasValue)
+        {
+            sessions = sessions.Where(s => s.DateTimeBeg.TimeOfDay == filter.SessionTime.Value);
+        }
+
+        // Фільтрація за жанром
+        if (!string.IsNullOrEmpty(filter.Genre))
+        {
+            sessions = sessions.Where(s => s.Film.Genres.Any(g => g.Name == filter.Genre));
+        }
+
+        // Фільтрація за рейтингом фільму
+        if (filter.MinRating.HasValue)
+        {
+            sessions = sessions.Where(s => s.Film.Rating >= (decimal)filter.MinRating.Value);
+        }
+        if (filter.MaxRating.HasValue)
+        {
+            sessions = sessions.Where(s => s.Film.Rating <= (decimal)filter.MaxRating.Value);
+        }
+
+        // Фільтрація за віковим рейтингом
+        if (!string.IsNullOrEmpty(filter.AgeRating))
+        {
+            sessions = sessions.Where(s => s.Film.AgeRating == filter.AgeRating);
+        }
+
+        // Фільтрація за датою виходу фільму
+        if (filter.ReleaseDate.HasValue)
+        {
+            sessions = sessions.Where(s => s.Film.ReleaseRate.Date == filter.ReleaseDate.Value.Date);
+        }
+
+        return sessions;
+    }
+    
+    public async Task<IEnumerable<string>> GetAllGenresAsync()
+    {
+        var films = await _unitOfWork.Repository<Film>().GetAsync(includeProperties: "Genres");
+        return films
+            .SelectMany(f => f.Genres.Select(g => g.Name))
+            .Distinct()
+            .OrderBy(g => g)
+            .ToList();
+    }
+
+    public async Task<IEnumerable<string>> GetAllAgeRatingsAsync()
+    {
+        var films = await _unitOfWork.Repository<Film>().GetAllAsync();
+        return films
+            .Select(f => f.AgeRating)
+            .Distinct()
+            .OrderBy(r => r)
+            .ToList();
+    }
+
+}

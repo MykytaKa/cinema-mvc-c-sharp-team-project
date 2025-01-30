@@ -22,26 +22,40 @@ body {
 }
 .transparent-button {
     color: black;
-    text-decoration: none; 
+    text-decoration: none;
     font-size: 16px;
-    margin: 0 10px; 
-    cursor: pointer; 
+    margin: 0 10px;
+    cursor: pointer;
 }
+
 .btt-login {
     color: black;
     text-decoration: none;
     font-size: 16px;
     margin: 0 10px;
     cursor: pointer;
-    background: none; /* Прибирає фон кнопки */
-    border: none; /* Прибирає рамку кнопки */
-    padding: 0; /* Прибирає внутрішні відступи */
+    background: none;
+    border: none;
+    padding: 0;
 }
 
-    .btt-login:focus {
-        outline: none; /* Прибирає рамку під час натискання */
-        box-shadow: none; /* Забирає тінь під час натискання */
-    }
+ .btt-login:focus {
+    outline: none;
+    box-shadow: none;
+ }
 
-   
+.forgot-password-link {
+    font-size: 14px;
+    color: #007bff;
+    text-decoration: none;
+}
 
+.forgot-password-link:hover {
+    text-decoration: underline;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

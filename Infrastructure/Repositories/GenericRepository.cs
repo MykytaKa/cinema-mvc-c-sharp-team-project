@@ -68,6 +68,8 @@ namespace Infrastructure.Repositories
 
             return await query.ToListAsync();
         }
+        
+        
 
         public virtual async Task InsertAsync(TEntity entity)
         {
@@ -114,6 +116,18 @@ namespace Infrastructure.Repositories
 
             return await query.ToListAsync();
         }
+        public virtual async Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter = null)
+        {
+            IQueryable<TEntity> query = _dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            return await query.FirstOrDefaultAsync();
+        }
+
 
         public async Task AddAsync(TEntity entity)
         {

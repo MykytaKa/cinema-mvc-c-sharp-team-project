@@ -1,75 +1,125 @@
-﻿@* @model *@
+﻿@model Core.FiltersModels.SessionFilterModel
 
-<h1>Viewing Sessions</h1>
-<table id="example" class="display" style="width:100%">
-    <thead>
-    <tr>
-        <th>№</th>
-        <th>Ім'я</th>
-        <th>Електронна пошта</th>
-        <th>Роль</th>
-    </tr>
-    <tr>
-        <th></th>
-        <th><input type="text" placeholder="Фільтр за ім'ям" /></th>
-        <th><input type="text" placeholder="Фільтр за email" /></th>
-        <th>
-            <select>
-                <option value="">Всі</option>
-                <option value="Адмін">Адмін</option>
-                <option value="Користувач">Користувач</option>
-            </select>
-        </th>
-    </tr>
-    </thead>
-    <tbody>
-    @* @foreach (var item in Model.Users) *@
-    @* { *@
-    @*     <tr> *@
-    @*         <td>@item.Id</td> *@
-    @*         <td>@item.Name</td> *@
-    @*         <td>@item.Email</td> *@
-    @*         <td>@item.Role</td> *@
-    @*     </tr> *@
-    @* } *@
-    </tbody>
-</table>
+<div class="container">
+    <div class="text-center">
+        <h1 class="text-center flex-grow-1 mb-4">Session</h1>
 
+        <!-- Форма фільтрації -->
+        <form method="get" asp-action="ViewingSessions" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Session date</label>
+                    <input type="date" name="SessionDate" class="form-control" value="@Model?.SessionDate?.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Session time</label>
+                    <input type="time" name="SessionTime" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Genre</label>
+                    <select name="Genre" class="form-control">
+                        <option value="">Choose a genre</option>
+                        @foreach (var genre in Model.AvailableGenres)
+                        {
+                            <option value="@genre" selected="@(Model.Genre == genre ? "selected" : null)">
+                                @genre
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Rating (min.)</label>
+                    <input type="number" name="MinRating" step="0.1" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Rating (max.)</label>
+                    <input type="number" name="MaxRating" step="0.1" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Duration (mm)</label>
+                    <input type="number" name="MinDuration" class="form-control" placeholder="From">
+                    <input type="number" name="MaxDuration" class="form-control mt-2" placeholder="To">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Age Rating</label>
+                    <select name="AgeRating" class="form-control">
+                        <option value="">Choose an age rating</option>
+                        @foreach (var ageRating in Model.AvailableAgeRatings)
+                        {
+                            <option value="@ageRating" selected="@(Model.AgeRating == ageRating ? "selected" : null)">
+                                @ageRating
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Movie release date</label>
+                    <input type="date" name="ReleaseDate" class="form-control">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Filter</button>
+            <a href="@Url.Action("ViewingSessions", "ViewingSessions")" class="btn btn-secondary mt-3">Reset filter</a>
+        </form>
 
-@section Scripts
-{
-    <script>
-        $(document).ready(function () {
-            // Ініціалізація DataTable
-            var table = $('#example').DataTable({
-                "paging": true,
-                "searching": true,
-                "ordering": true,
-                "language": {
-                    "search": "Пошук:",
-                    "lengthMenu": "Показати _MENU_ записів",
-                    "info": "Показано _START_ до _END_ з _TOTAL_ записів",
-                    "paginate": {
-                        "next": "Наступна",
-                        "previous": "Попередня"
-                    }
+        <!-- Виведення фільмів -->
+        <div id="moviesContainer" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @if (Model.Films != null && Model.Films.Any())
+            {
+                @foreach (var film in Model.Films)
+                {
+                    var collapseId = $"collapse-{film.Id}";  // Унікальний ідентифікатор для кожного фільму
+
+                    <div class="col d-flex">
+                        <div class="card h-100 shadow-sm d-flex flex-column">
+                            <img class="card-img-top" src="@film.PosterURL" alt="@film.Name">
+                            <div class="card-body flex-grow-1 d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5 class="card-title text-center">@film.Name</h5>
+                                    <p class="card-text">
+                                        <strong>Genres:</strong> @(film?.Genres != null ? string.Join(", ", film.Genres.Select(g => g.Name)) : "Немає жанрів")<br />
+                                        <strong>Rating:</strong> @(film?.Rating)<br />
+                                        <strong>Duration:</strong> @(film?.Duration) хв<br />
+                                        <strong>Age Rating:</strong> @film?.AgeRating
+                                    </p>
+                                    <a asp-controller="ViewingSessions" asp-action="ViewingSessions" asp-route-id="@film.Id" class="btn btn-primary">
+                                        Movie review
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-light">
+                                <h6 class="text-center mb-2">Session:</h6>
+                                <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                                    Unhide/Hide Sessions
+                                </button>
+                                <div class="collapse mt-3" id="@collapseId">
+                                    @if (film?.Sessions != null && film.Sessions.Any())
+                                    {
+                                        <ul class="list-group">
+                                            @foreach (var s in film.Sessions.Where(s => !Model.SessionDate.HasValue || s.DateTimeBeg.Date == Model.SessionDate.Value.Date))
+                                            {
+                                                <li class="list-group-item">
+                                                    <strong>Beginning:</strong> @s.DateTimeBeg.ToString("dd.MM.yyyy HH:mm")<br />
+                                                    <strong>End:</strong> @s.DateTimeEnd.ToString("HH:mm")<br />
+                                                    <strong>Price:</strong> @s.Price.ToString("0.00") грн<br />
+                                                    <strong>Hall:</strong> @s.Hall.Name
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted text-center">Немає доступних сеансів</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 }
-            });
-
-            // Фільтри для текстових полів
-            $('#example thead input').on('keyup change', function () {
-                let colIndex = $(this).parent().index(); // Індекс колонки
-                table.column(colIndex).search(this.value).draw();
-            });
-
-            // Фільтри для випадаючих списків
-            $('#example thead select').on('change', function () {
-                let colIndex = $(this).parent().index(); // Індекс колонки
-                table.column(colIndex).search(this.value).draw();
-            });
-        });
-    </script>
-
-}
-
-
+            }
+            else
+            {
+                <p class="text-center text-muted">Немає доступних сеансів.</p>
+            }
+        </div>
+    </div>
+</div>

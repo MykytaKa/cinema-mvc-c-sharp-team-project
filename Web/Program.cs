@@ -10,6 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Core.Interfaces.Services;
 using Infrastructure.Services;
+using Infrastructure.Services;
+using Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,17 +27,19 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 );
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<IEmailService, SendGridEmailService>(); // Р’РёРєРѕСЂРёСЃС‚Р°РЅРЅСЏ SendGridEmailService
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<IFilmSimilarityUpdateService, FilmSimilarityUpdateService>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Конфігурація HTTP конвеєра запитів
+// РљРѕРЅС„С–РіСѓСЂР°С†С–СЏ HTTP РєРѕРЅРІРµС”СЂР° Р·Р°РїРёС‚С–РІ
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // Значення за замовчуванням для HSTS становить 30 днів. Ви можете змінити це для виробничих сценаріїв.
+    // Р—РЅР°С‡РµРЅРЅСЏ Р·Р° Р·Р°РјРѕРІС‡СѓРІР°РЅРЅСЏРј РґР»СЏ HSTS СЃС‚Р°РЅРѕРІРёС‚СЊ 30 РґРЅС–РІ. Р’Рё РјРѕР¶РµС‚Рµ Р·РјС–РЅРёС‚Рё С†Рµ РґР»СЏ РІРёСЂРѕР±РЅРёС‡РёС… СЃС†РµРЅР°СЂС–С—РІ.
     app.UseHsts();
 }
 
@@ -52,12 +56,12 @@ app.MapControllerRoute(
 
 app.Run();
 
-// Додаємо FluentValidation
+// Р”РѕРґР°С”РјРѕ FluentValidation
 builder.Services.AddFluentValidationAutoValidation()
     .AddValidatorsFromAssemblyContaining<RegisterUserValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
 
-// JWT налаштування
+// JWT РЅР°Р»Р°С€С‚СѓРІР°РЅРЅСЏ
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
@@ -80,11 +84,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Додайте це для використання аутентифікації
 builder.Services.AddAuthorization();
 
-app.UseAuthentication(); // Підключаємо аутентифікацію
-app.UseAuthorization();  // Підключаємо авторизацію
+app.UseAuthentication(); // РџС–РґРєР»СЋС‡Р°С”РјРѕ Р°СѓС‚РµРЅС‚РёС„С–РєР°С†С–СЋ
+app.UseAuthorization();  // РџС–РґРєР»СЋС‡Р°С”РјРѕ Р°РІС‚РѕСЂРёР·Р°С†С–СЋ
 app.Use(async (context, next) =>
 {
     if (!context.User.Identity.IsAuthenticated)

@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
+using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -11,11 +12,14 @@ namespace Web.Controllers
     {
         private readonly ILogger<AdminController> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IFilmSimilarityUpdateService _filmSimilarityUpdateService;
 
-        public AdminController(ILogger<AdminController> logger, IUnitOfWork unitOfWork)
+        public AdminController(ILogger<AdminController> logger, IUnitOfWork unitOfWork, 
+            IFilmSimilarityUpdateService filmSimilarityUpdateService)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _filmSimilarityUpdateService = filmSimilarityUpdateService;
         }
 
         public IActionResult Admin()
@@ -293,12 +297,7 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteFilmById(int filmId)
         {
-            var film = await _unitOfWork.Repository<Film>().GetByIDAsync(filmId); // Виправимо це нижче
-            if (film != null)
-            {
-                _unitOfWork.Repository<Film>().DeleteAsync(film);
-                await _unitOfWork.SaveAsync(); // Викликаємо SaveAsync
-            }
+            await _filmSimilarityUpdateService.DeleteFilmWithSimilaritiesAsync(filmId);
             return RedirectToAction(nameof(DeleteFilm));
         }
 
@@ -332,6 +331,7 @@ namespace Web.Controllers
             try
             {
                 await _unitOfWork.Repository<Film>().InsertAsync(film);
+                await _filmSimilarityUpdateService.UpdateSimilaritiesForFilmAsync(film.Id);
                 await _unitOfWork.SaveAsync();
                 if (model.SelectedActorIds != null && model.SelectedActorIds.Any())
                 {

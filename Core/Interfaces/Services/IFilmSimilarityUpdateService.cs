@@ -9,5 +9,6 @@ namespace Core.Interfaces.Services
     public interface IFilmSimilarityUpdateService
     {
         Task UpdateSimilaritiesForFilmAsync(int filmId);
+        Task DeleteFilmWithSimilaritiesAsync(int filmId);
     }
 }

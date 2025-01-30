@@ -1,32 +1,64 @@
-﻿using Core.Entities;
+﻿using System.Security.Claims;
+using Core.Entities;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Web.Models;
 
 namespace Web.Controllers
 {
     public class RecommendationController: Controller
     {
         private readonly ILogger<RecommendationController> _logger;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IRecommendationService _recommendationService;
-        private readonly IFilmSimilarityUpdateService _filmSimilarityUpdateService;
 
         public RecommendationController(
-            ILogger<RecommendationController> logger, IUnitOfWork unitOfWork, 
-            IRecommendationService recoService, IFilmSimilarityUpdateService filmSimilarityUpdateService
+            ILogger<RecommendationController> logger,
+            IRecommendationService recoService
             )
         {
             _logger = logger;
-            _unitOfWork = unitOfWork;
             _recommendationService = recoService;
-            _filmSimilarityUpdateService = filmSimilarityUpdateService;
         }
 
         public async Task<IActionResult> Recommend()
         {
-            await _filmSimilarityUpdateService.UpdateSimilaritiesForFilmAsync(1);
-            return View();
+            _logger.LogInformation("Starting recommendation process.");
+
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (!int.TryParse(userIdClaim, out int userId))
+                {
+                    _logger.LogWarning("Failed to retrieve a valid User ID from token.");
+                    return Unauthorized("Invalid User ID.");
+                }
+
+                _logger.LogDebug("Fetching recommended films...");
+                var recoFilms = await _recommendationService.GetRecommendations(userId);
+
+                if (recoFilms == null || !recoFilms.Any())
+                {
+                    _logger.LogWarning("No recommended films were found.");
+                    return View(new List<FilmRecoViewModel>());
+                }
+
+                _logger.LogDebug("Mapping recommended films to view models...");
+                var recoFilmModels = recoFilms.Select(f => new FilmRecoViewModel
+                {
+                    Title = f.Name,
+                    PosterUrl = f.PosterURL
+                }).ToList();
+
+                _logger.LogInformation("Successfully generated recommended films list.");
+                return View(recoFilmModels);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while generating film recommendations.");
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
         }
     }
 }

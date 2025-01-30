@@ -111,5 +111,37 @@ namespace Core.Interfaces.Services
 
             return similarity;
         }
+
+        public async Task DeleteFilmWithSimilaritiesAsync(int filmId)
+        {
+            _logger.LogInformation("Deleting film with ID {FilmId} and its similarity records.", filmId);
+
+            // Delete every record which contains the film
+            var similarities = await _unitOfWork.Repository<FilmSimilarity>().GetAsync(
+                filter: fs => fs.Film1Id == filmId || fs.Film2Id == filmId
+            );
+
+            _logger.LogInformation("Found {Count} similarity records to delete.", similarities.Count());
+
+            foreach (var similarity in similarities)
+            {
+                await _unitOfWork.Repository<FilmSimilarity>().DeleteAsync(similarity);
+            }
+
+            // Delete the film
+            var film = await _unitOfWork.Repository<Film>().GetByIDAsync(filmId);
+            if (film == null)
+            {
+                _logger.LogError("Film with ID {FilmId} not found.", filmId);
+                throw new ArgumentException($"Film with ID {filmId} not found.");
+            }
+
+            await _unitOfWork.Repository<Film>().DeleteAsync(film);
+
+            // Save changes
+            await _unitOfWork.SaveAsync();
+            _logger.LogInformation("Successfully deleted film with ID {FilmId} and its similarity records.", filmId);
+        }
+
     }
 }

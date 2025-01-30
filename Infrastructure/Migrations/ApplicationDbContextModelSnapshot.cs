@@ -34,7 +34,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("FilmsId");
 
-                    b.ToTable("ActorFilm");
+                    b.ToTable("ActorFilm", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Actor", b =>
@@ -55,7 +55,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Actors");
+                    b.ToTable("Actors", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Booking", b =>
@@ -89,7 +89,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Film", b =>
@@ -135,7 +135,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Films");
+                    b.ToTable("Films", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.FilmSimilarity", b =>
@@ -161,7 +161,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("Film2Id");
 
-                    b.ToTable("FilmSimilarities");
+                    b.ToTable("FilmSimilarities", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Genre", b =>
@@ -178,7 +178,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Genres");
+                    b.ToTable("Genres", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Hall", b =>
@@ -198,7 +198,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Halls");
+                    b.ToTable("Halls", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Seat", b =>
@@ -222,7 +222,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("HallId");
 
-                    b.ToTable("Seats");
+                    b.ToTable("Seats", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Session", b =>
@@ -252,9 +252,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("FilmId");
 
-                    b.HasIndex("HallId");
-
-                    b.ToTable("Sessions");
+                    b.ToTable("Sessions", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Status", b =>
@@ -271,7 +269,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Status");
+                    b.ToTable("Status", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Ticket", b =>
@@ -294,7 +292,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SeatId");
 
-                    b.ToTable("Tickets");
+                    b.ToTable("Tickets", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.User", b =>
@@ -335,7 +333,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.User_Type", b =>
@@ -352,7 +350,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User_Types");
+                    b.ToTable("User_Types", (string)null);
                 });
 
             modelBuilder.Entity("FilmGenre", b =>
@@ -367,7 +365,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("GenresId");
 
-                    b.ToTable("FilmGenre");
+                    b.ToTable("FilmGenre", (string)null);
                 });
 
             modelBuilder.Entity("ActorFilm", b =>
@@ -452,7 +450,7 @@ namespace Infrastructure.Migrations
 
                     b.HasOne("Core.Entities.Hall", "Hall")
                         .WithMany("Sessions")
-                        .HasForeignKey("HallId")
+                        .HasForeignKey("FilmId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

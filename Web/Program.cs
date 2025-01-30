@@ -28,6 +28,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IEmailService, SendGridEmailService>(); // Використання SendGridEmailService
 builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
 
 // ������ FluentValidation
 builder.Services.AddFluentValidationAutoValidation()
@@ -77,6 +78,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapControllers();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

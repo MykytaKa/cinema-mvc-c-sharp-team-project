@@ -12,13 +12,16 @@ namespace Web.Controllers
     {
         private readonly ILogger<AdminController> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly string _apiKey = "c8a260e94876a3a04f0317efa68269ac";
+        private readonly IConfiguration _configuration;
         private readonly IFilmSimilarityUpdateService _filmSimilarityUpdateService;
 
-        public AdminController(ILogger<AdminController> logger, IUnitOfWork unitOfWork, 
+        public AdminController(ILogger<AdminController> logger, IUnitOfWork unitOfWork, IConfiguration configuration,
             IFilmSimilarityUpdateService filmSimilarityUpdateService)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _configuration = configuration;
             _filmSimilarityUpdateService = filmSimilarityUpdateService;
         }
 
@@ -297,7 +300,12 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteFilmById(int filmId)
         {
-            await _filmSimilarityUpdateService.DeleteFilmWithSimilaritiesAsync(filmId);
+            var film = await _unitOfWork.Repository<Film>().GetByIDAsync(filmId);
+            if (film != null)
+            {
+                _unitOfWork.Repository<Film>().DeleteAsync(film);
+                await _unitOfWork.SaveAsync();
+            }
             return RedirectToAction(nameof(DeleteFilm));
         }
 

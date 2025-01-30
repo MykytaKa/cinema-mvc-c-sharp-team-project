@@ -10,14 +10,13 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Core.Interfaces.Services;
 using Infrastructure.Services;
-using Infrastructure.Services;
 using Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// Налаштування бази даних
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlOptions=>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlOptions =>
     {
         sqlOptions.EnableRetryOnFailure(
             maxRetryCount: 5,
@@ -26,42 +25,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     })
 );
 
+// Реєстрація залежностей
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ISessionService, SessionService>();
-builder.Services.AddScoped<IEmailService, SendGridEmailService>(); // Використання SendGridEmailService
+builder.Services.AddScoped<IEmailService, SendGridEmailService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<IFilmSimilarityUpdateService, FilmSimilarityUpdateService>();
+
+// Додаємо контролери та представлення
 builder.Services.AddControllersWithViews();
 
-var app = builder.Build();
-
-// Конфігурація HTTP конвеєра запитів
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // Значення за замовчуванням для HSTS становить 30 днів. Ви можете змінити це для виробничих сценаріїв.
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.Run();
-
-// Додаємо FluentValidation
-builder.Services.AddFluentValidationAutoValidation()
-    .AddValidatorsFromAssemblyContaining<RegisterUserValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
-
-// JWT налаштування
+// Налаштування JWT
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
@@ -84,18 +58,36 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Додаємо авторизацію
 builder.Services.AddAuthorization();
 
-app.UseAuthentication(); // Підключаємо аутентифікацію
-app.UseAuthorization();  // Підключаємо авторизацію
-app.Use(async (context, next) =>
-{
-    if (!context.User.Identity.IsAuthenticated)
-    {
-        context.Response.StatusCode = 401; // Unauthorized
-        return;
-    }
+// Додаємо FluentValidation
+builder.Services.AddFluentValidationAutoValidation()
+    .AddValidatorsFromAssemblyContaining<RegisterUserValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
 
-    await next();
-});
+var app = builder.Build();
+
+// Конфігурація HTTP конвеєра
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthentication(); // Викликаємо після UseRouting
+app.UseAuthorization();  // Обов’язково після UseAuthentication
+
+// Реєструємо маршрути
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
+
 

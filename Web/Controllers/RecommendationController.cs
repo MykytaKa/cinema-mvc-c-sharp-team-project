@@ -2,6 +2,7 @@
 using Core.Entities;
 using Core.Interfaces;
 using Core.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Models;
 
@@ -27,16 +28,16 @@ namespace Web.Controllers
 
             try
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var userIdClaim = User.FindFirst("UserId")?.Value;
 
-                if (!int.TryParse(userIdClaim, out int userId))
+                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
                 {
                     _logger.LogWarning("Failed to retrieve a valid User ID from token.");
                     return Unauthorized("Invalid User ID.");
                 }
 
                 _logger.LogDebug("Fetching recommended films...");
-                var recoFilms = await _recommendationService.GetRecommendations(userId);
+                var recoFilms = await _recommendationService.GetRecommendations(1);
 
                 if (recoFilms == null || !recoFilms.Any())
                 {

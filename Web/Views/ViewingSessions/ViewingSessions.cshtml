@@ -8,6 +8,10 @@
         <form method="get" asp-action="ViewingSessions" class="mb-4">
             <div class="row g-3">
                 <div class="col-md-4">
+                    <label class="form-label">Movie Name</label>
+                    <input type="text" name="FilmName" class="form-control" placeholder="Введіть назву" value="@Model?.FilmName">
+                </div>
+                <div class="col-md-4">
                     <label class="form-label">Session date</label>
                     <input type="date" name="SessionDate" class="form-control" value="@Model?.SessionDate?.ToString("yyyy-MM-dd")">
                 </div>
@@ -35,11 +39,11 @@
                     <label class="form-label">Rating (max.)</label>
                     <input type="number" name="MaxRating" step="0.1" class="form-control">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Duration (mm)</label>
-                    <input type="number" name="MinDuration" class="form-control" placeholder="From">
-                    <input type="number" name="MaxDuration" class="form-control mt-2" placeholder="To">
-                </div>
+                @* <div class="col-md-4"> *@
+                @*     <label class="form-label">Duration (mm)</label> *@
+                @*     <input type="number" name="MinDuration" class="form-control" placeholder="From"> *@
+                @*     <input type="number" name="MaxDuration" class="form-control mt-2" placeholder="To"> *@
+                @* </div> *@
                 <div class="col-md-4">
                     <label class="form-label">Age Rating</label>
                     <select name="AgeRating" class="form-control">

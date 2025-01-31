@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250127131337_AddSimilarityMatrixToDb")]
+    partial class AddSimilarityMatrixToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +37,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("FilmsId");
 
-                    b.ToTable("ActorFilm", (string)null);
+                    b.ToTable("ActorFilm");
                 });
 
             modelBuilder.Entity("Core.Entities.Actor", b =>
@@ -55,7 +58,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Actors", (string)null);
+                    b.ToTable("Actors");
                 });
 
             modelBuilder.Entity("Core.Entities.Booking", b =>
@@ -89,7 +92,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("Core.Entities.Film", b =>
@@ -135,7 +138,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Films", (string)null);
+                    b.ToTable("Films");
                 });
 
             modelBuilder.Entity("Core.Entities.FilmSimilarity", b =>
@@ -161,7 +164,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("Film2Id");
 
-                    b.ToTable("FilmSimilarities", (string)null);
+                    b.ToTable("FilmSimilarities");
                 });
 
             modelBuilder.Entity("Core.Entities.Genre", b =>
@@ -178,7 +181,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Genres", (string)null);
+                    b.ToTable("Genres");
                 });
 
             modelBuilder.Entity("Core.Entities.Hall", b =>
@@ -198,7 +201,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Halls", (string)null);
+                    b.ToTable("Halls");
                 });
 
             modelBuilder.Entity("Core.Entities.Seat", b =>
@@ -222,7 +225,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("HallId");
 
-                    b.ToTable("Seats", (string)null);
+                    b.ToTable("Seats");
                 });
 
             modelBuilder.Entity("Core.Entities.Session", b =>
@@ -252,7 +255,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("FilmId");
 
-                    b.ToTable("Sessions", (string)null);
+                    b.ToTable("Sessions");
                 });
 
             modelBuilder.Entity("Core.Entities.Status", b =>
@@ -269,7 +272,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Status", (string)null);
+                    b.ToTable("Status");
                 });
 
             modelBuilder.Entity("Core.Entities.Ticket", b =>
@@ -292,7 +295,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SeatId");
 
-                    b.ToTable("Tickets", (string)null);
+                    b.ToTable("Tickets");
                 });
 
             modelBuilder.Entity("Core.Entities.User", b =>
@@ -333,7 +336,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Core.Entities.User_Type", b =>
@@ -350,7 +353,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User_Types", (string)null);
+                    b.ToTable("User_Types");
                 });
 
             modelBuilder.Entity("FilmGenre", b =>
@@ -365,7 +368,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("GenresId");
 
-                    b.ToTable("FilmGenre", (string)null);
+                    b.ToTable("FilmGenre");
                 });
 
             modelBuilder.Entity("ActorFilm", b =>

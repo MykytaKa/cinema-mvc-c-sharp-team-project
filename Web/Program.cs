@@ -10,12 +10,13 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Infrastructure.Services;
 using Web.Services;
+using Core.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlOptions=>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlOptions =>
     {
         sqlOptions.EnableRetryOnFailure(
             maxRetryCount: 5,
@@ -28,6 +29,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddScoped<IFilmSimilarityUpdateService, FilmSimilarityUpdateService>();
 builder.Services.AddScoped<IEmailService, SendGridEmailService>(); // Використання SendGridEmailService
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
@@ -108,11 +111,6 @@ app.MapControllerRoute(
     pattern: "{controller=ViewingSessions}/{action=ViewingSessions}/{id?}");
 
 app.Run();
-
-
-
-
-
 
 builder.Services.AddAuthorization();
 

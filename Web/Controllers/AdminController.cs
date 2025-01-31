@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
+using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,12 +15,15 @@ namespace Web.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly string _apiKey = "c8a260e94876a3a04f0317efa68269ac";
         private readonly IConfiguration _configuration;
+        private readonly IFilmSimilarityUpdateService _filmSimilarityUpdateService;
 
-        public AdminController(ILogger<AdminController> logger, IUnitOfWork unitOfWork, IConfiguration configuration)
+        public AdminController(ILogger<AdminController> logger, IUnitOfWork unitOfWork, IConfiguration configuration,
+            IFilmSimilarityUpdateService filmSimilarityUpdateService)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
             _configuration = configuration;
+            _filmSimilarityUpdateService = filmSimilarityUpdateService;
         }
 
         public IActionResult Admin()
@@ -334,12 +338,7 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteFilmById(int filmId)
         {
-            var film = await _unitOfWork.Repository<Film>().GetByIDAsync(filmId);
-            if (film != null)
-            {
-                _unitOfWork.Repository<Film>().DeleteAsync(film);
-                await _unitOfWork.SaveAsync();
-            }
+            await _filmSimilarityUpdateService.DeleteFilmWithSimilaritiesAsync(filmId);
             return RedirectToAction(nameof(DeleteFilm));
         }
 
@@ -420,8 +419,8 @@ namespace Web.Controllers
             };
 
             await _unitOfWork.Repository<Film>().InsertAsync(filmEntity);
-
             await _unitOfWork.SaveAsync();
+            await _filmSimilarityUpdateService.UpdateSimilaritiesForFilmAsync(filmEntity.Id);
 
             return Ok(new { message = "Film added successfully!" });
         }

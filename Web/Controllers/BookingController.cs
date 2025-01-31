@@ -7,6 +7,7 @@ using Web.Models;
 
 namespace Web.Controllers;
 
+[Authorize]
 public class BookingController : Controller
 {
     private readonly IBookingService _bookingService;
@@ -25,8 +26,7 @@ public class BookingController : Controller
 
         return View("Booking", model); 
     }
-
-    [Authorize]
+    
     [HttpPost("Booking/ConfirmBooking")]
     public async Task<IActionResult> ConfirmBooking(BookSessionViewModel model)
     {

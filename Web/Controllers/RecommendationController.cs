@@ -22,6 +22,7 @@ namespace Web.Controllers
             _recommendationService = recoService;
         }
 
+        [Authorize]
         public async Task<IActionResult> Recommend()
         {
             _logger.LogInformation("Starting recommendation process.");

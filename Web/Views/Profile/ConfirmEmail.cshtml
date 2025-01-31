@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "Confirm Email";
+}
+
+<h2 class="text-center mb-4">Confirm Email</h2>
+
+<form asp-action="ConfirmEmail" method="post">
+    <label for="code">Enter verification code:</label>
+    <input type="text" class="form-control" id="code" name="code" required />
+    <button type="submit" class="btn btn-success mt-3">Verify</button>
+</form>

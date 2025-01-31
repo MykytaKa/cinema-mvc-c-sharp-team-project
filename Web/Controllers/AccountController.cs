@@ -47,7 +47,7 @@ namespace Web.Controllers
             var createdUser = await userRepository.GetAsync(u => u.Email == model.Email);
             SetAuthToken(createdUser.First());
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("ViewingSessions", "ViewingSessions");
         }
 
         [HttpGet]
@@ -66,14 +66,14 @@ namespace Web.Controllers
                 return View(model);
 
             SetAuthToken(user);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("ViewingSessions", "ViewingSessions");
         }
 
         [HttpPost]
         public IActionResult Logout()
         {
             Response.Cookies.Delete("AuthToken");
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("ViewingSessions", "ViewingSessions");
         }
 
         [Authorize]

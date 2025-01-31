@@ -38,7 +38,7 @@ namespace Web.Controllers
                 }
 
                 _logger.LogDebug("Fetching recommended films...");
-                var recoFilms = await _recommendationService.GetRecommendations(1);
+                var recoFilms = await _recommendationService.GetRecommendations(userId);
 
                 if (recoFilms == null || !recoFilms.Any())
                 {

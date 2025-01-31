@@ -93,11 +93,14 @@ namespace Infrastructure.Services
             _logger.LogInformation("Retrieving bookings for user with ID {UserId}.", userId);
             var bookings = await _unitOfWork.Repository<Booking>().GetAsync(
                 filter: b => (b.Status.Name == "Checked-in" || b.Status.Name == "Reserved") && b.UserId == userId,
-                includeProperties: "Session"
+                includeProperties: "Session.Film"
             );
 
             _logger.LogInformation("Found {BookingCount} bookings for user with ID {UserId}.", bookings.Count(), userId);
-            return bookings.Select(b => b.Session.Film).Distinct().ToList();
+            return bookings
+                .Where(b => b.Session?.Film != null)
+                .Select(b => b.Session.Film!)
+                .Distinct();
         }
     }
 

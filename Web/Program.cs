@@ -24,6 +24,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     })
 );
 
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
@@ -75,6 +76,16 @@ builder.Services.AddAuthorization();
 
 
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    await next();
+
+    if (context.Response.StatusCode == 401) // Якщо користувач неавторизований
+    {
+        context.Response.Redirect("/Account/Login");
+    }
+});
 
 // ������������ HTTP ������� ������
 if (!app.Environment.IsDevelopment())

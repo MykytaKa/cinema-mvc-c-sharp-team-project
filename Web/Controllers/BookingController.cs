@@ -35,20 +35,21 @@ public class BookingController : Controller
             ModelState.AddModelError("", " Ви не вибрали місця!");
             return View("Booking", model);
         }
-        
-        // Перевіряємо, чи користувач авторизований
-        if (!User.Identity.IsAuthenticated)
+
+        // отримання UserId
+        string? userIdClaim = User.FindFirstValue("UserId");
+    
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
         {
-            ModelState.AddModelError("", "Ви повинні увійти в систему для бронювання!");
-            return View("Booking", model);
+            Console.WriteLine($" Помилка: UserId не є числом! Отримано: {userIdClaim}");
+            return Unauthorized(new { message = "Помилка авторизації!" });
         }
 
-        int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        Console.WriteLine($"➡ Користувач {userId} підтверджує бронювання: SessionId={model.SessionId}, Місця={string.Join(", ", model.SelectedSeats)}");
+        Console.WriteLine($" Авторизований користувач: {userId}");
 
         var bookingDto = new CreateBookingDto
         {
-            UserId = userId, // 🔹 Замінити на реального користувача
+            UserId = userId,
             SessionId = model.SessionId,
             SeatIds = model.SelectedSeats
         };
@@ -60,7 +61,7 @@ public class BookingController : Controller
             return View("Booking", model);
         }
 
-        Console.WriteLine("🎉 Бронювання успішне! Перенаправлення на сторінку бронювань...");
-        return RedirectToAction("Bookings", new { userId = 1 });
+        Console.WriteLine(" Бронювання успішне! Перенаправлення на сторінку бронювань...");
+        return RedirectToAction("Bookings", new { userId = userId });
     }
 }

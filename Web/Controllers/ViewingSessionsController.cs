@@ -1,11 +1,6 @@
-﻿using Core.Entities;
-using Core.FiltersModels;
+﻿using Core.FiltersModels;
 using Core.Interfaces;
-using Infrastructure.Data;
-using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Web.Controllers;
 

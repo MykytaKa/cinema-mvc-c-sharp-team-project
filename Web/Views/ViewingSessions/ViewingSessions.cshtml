@@ -105,10 +105,15 @@
                                                     <strong>Beginning:</strong> @s.DateTimeBeg.ToString("dd.MM.yyyy HH:mm")<br />
                                                     <strong>End:</strong> @s.DateTimeEnd.ToString("HH:mm")<br />
                                                     <strong>Price:</strong> @s.Price.ToString("0.00") грн<br />
-                                                    <strong>Hall:</strong> @s.Hall.Name
+                                                    <strong>Hall:</strong> @s.Hall.Name<br />
+                                                    <a asp-controller="Booking" asp-action="BookSession" asp-route-sessionId="@s.Id" class="btn btn-success mt-2">
+                                                        Забронювати
+                                                    </a>
                                                 </li>
+                                                
                                             }
                                         </ul>
+                                        
                                     }
                                     else
                                     {

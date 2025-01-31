@@ -7,6 +7,7 @@ namespace Web.Models
 {
     public class FilmViewModel
     {
+        public int Id { get; set; }
         [Required]
         [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters.")]
         public string Name { get; set; }

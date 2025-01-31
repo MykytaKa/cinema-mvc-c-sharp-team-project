@@ -1,0 +1,24 @@
+﻿@model Core.Models.BookSessionViewModel
+
+<div class="container">
+    <h2>Бронювання: @Model.FilmName</h2>
+    <p><strong>Дата:</strong> @Model.SessionDate.ToString("dd.MM.yyyy HH:mm")</p>
+    <p><strong>Зала:</strong> @Model.HallName</p>
+    <p><strong>Ціна:</strong> @Model.SessionPrice грн</p>
+
+    <form method="post" asp-action="ConfirmBooking">
+        <input type="hidden" asp-for="SessionId" />
+        <label>Оберіть місця:</label>
+        <div>
+            @foreach (var seat in Model.AvailableSeats)
+            {
+                <div>
+                    <input type="checkbox" name="SelectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" />
+                    <label for="seat-@seat.SeatId">Ряд @seat.Row, Місце @seat.Column</label>
+                </div>
+            }
+        </div>
+        <button type="submit" class="btn btn-primary">Підтвердити</button>
+    </form>
+
+</div>

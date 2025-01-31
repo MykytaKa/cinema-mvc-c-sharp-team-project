@@ -25,8 +25,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     })
 );
 
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<IFilmSimilarityUpdateService, FilmSimilarityUpdateService>();
 builder.Services.AddScoped<IEmailService, SendGridEmailService>(); // Використання SendGridEmailService
@@ -43,10 +45,10 @@ var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
 builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -77,6 +79,16 @@ builder.Services.AddAuthorization();
 
 
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    await next();
+
+    if (context.Response.StatusCode == 401) // Якщо користувач неавторизований
+    {
+        context.Response.Redirect("/Account/Login");
+    }
+});
 
 // ������������ HTTP ������� ������
 if (!app.Environment.IsDevelopment())
@@ -114,3 +126,4 @@ app.Use(async (context, next) =>
 
     await next();
 });
+

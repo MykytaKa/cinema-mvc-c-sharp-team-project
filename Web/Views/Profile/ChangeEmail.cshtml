@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "Change Email";
+}
+
+<h2 class="text-center mb-4">Change Email</h2>
+
+<form  asp-action="ChangeEmail" method="post">
+    <label for="newEmail">New Email:</label>
+    <input type="email"  class="form-control" id="newEmail" name="newEmail" required />
+    <button type="submit" class="btn btn-success mt-3">Send Verification Code</button>
+</form>

@@ -32,27 +32,28 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Recommendation" asp-action="Recommend">Recommendations</a>
                         </li>
-                    </ul>
-                            
-                    <!-- Додаткове меню справа -->
+                    </ul>                            
                     <ul class="navbar-nav ml-auto">
                         @if (Context.Request.Cookies["AuthToken"] != null)
-                         {
-                    <!-- Кнопка Logout -->
-                     <li class="nav-item">
-                        <form asp-controller="Account" asp-action="Logout" method="post" class="btt-login">
-                            <button type="submit" class="btt-login">LogOut</button>
-                        </form>
-                     </li>
+                        {                               
+                                <li class="nav-item ">
+                                            <a class="btt-login" asp-controller="Profile" asp-action="Profile">User Profile</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="btt-login">
+                                        <button type="submit" class="btt-login">LogOut</button>
+                                    </form>
+                                </li>
                         }
                         else
                         {
-                        <li class="nav-item">
-                            <a class="transparent-button" asp-area="" asp-controller="Account" asp-action="Register">Registration</a>
-                        </li>
-                        <li class="nav-item">
-                <a class="btt-login" asp-controller="Account" asp-action="Login">Login</a>
-                        </li>
+                                <li class="nav-item">
+                                    <a class="transparent-button" asp-area="" asp-controller="Account" asp-action="Register">Registration</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="btt-login" asp-controller="Account" asp-action="Login">Login</a>
+                                </li>
                         }
                     </ul>
                 </div>

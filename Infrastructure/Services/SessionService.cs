@@ -20,6 +20,12 @@ public class SessionService : ISessionService
         var sessions = await _unitOfWork.Repository<Session>()
             .GetAsync(includeProperties: "Film.Genres,Hall,Bookings");
 
+        // Фільтрація за назвою фільму (пошук часткового збігу)
+        if (!string.IsNullOrEmpty(filter.FilmName))
+        {
+            sessions = sessions.Where(s => s.Film.Name.Contains(filter.FilmName, StringComparison.OrdinalIgnoreCase));
+        }
+        
         // Фільтрація за датою сеансу
         if (filter.SessionDate.HasValue)
         {

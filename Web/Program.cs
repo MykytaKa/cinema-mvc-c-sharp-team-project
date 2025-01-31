@@ -8,9 +8,9 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Core.Interfaces.Services;
 using Infrastructure.Services;
 using Web.Services;
+using Core.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,22 +27,22 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ISessionService, SessionService>();
-builder.Services.AddScoped<IEmailService, SendGridEmailService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<IFilmSimilarityUpdateService, FilmSimilarityUpdateService>();
+builder.Services.AddScoped<IEmailService, SendGridEmailService>(); // Використання SendGridEmailService
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 
+// ������ FluentValidation
+builder.Services.AddFluentValidationAutoValidation()
+    .AddValidatorsFromAssemblyContaining<RegisterUserValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
 
-// ������������ HTTP ������� ������
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // �������� �� ������������� ��� HSTS ��������� 30 ���. �� ������ ������ �� ��� ���������� �������.
-    app.UseHsts();
-}
+// JWT ������������
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
-app.UseHttpsRedirection();
+builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -71,51 +71,7 @@ app.UseHttpsRedirection();
             }
         };
     });
-    // �������� �� ������������� ��� HSTS ��������� 30 ���. �� ������ ������ �� ��� ���������� �������.
 
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.Run();
-
-// ������ FluentValidation
-builder.Services.AddFluentValidationAutoValidation()
-    .AddValidatorsFromAssemblyContaining<RegisterUserValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
-
-// JWT ������������
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(key)
-    };
-});
 
 builder.Services.AddAuthorization();
 

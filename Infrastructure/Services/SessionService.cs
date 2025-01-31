@@ -19,7 +19,8 @@ public class SessionService : ISessionService
     {
         var sessions = await _unitOfWork.Repository<Session>()
             .GetAsync(includeProperties: "Film.Genres,Hall,Bookings");
-
+        
+        
         // Фільтрація за назвою фільму (пошук часткового збігу)
         if (!string.IsNullOrEmpty(filter.FilmName))
         {
@@ -33,6 +34,13 @@ public class SessionService : ISessionService
         }
         
         // Фільтрація за часом сеансу (опціонально)
+        var now = DateTime.Now;
+        
+        if (filter.SessionDate != null && filter.SessionDate.Value.Date == now.Date)
+        {
+            sessions = sessions.Where(s => s.DateTimeEnd > now);
+        }
+        
         if (filter.SessionTime.HasValue)
         {
             sessions = sessions.Where(s => s.DateTimeBeg.TimeOfDay == filter.SessionTime.Value);

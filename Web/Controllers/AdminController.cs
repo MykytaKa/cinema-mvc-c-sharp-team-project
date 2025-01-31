@@ -79,7 +79,7 @@ namespace Web.Controllers
                 for (int i = 0; i < model.NumberOfDays; i++)
                 {
                     var sessionDateTimeBeg = model.DateTimeBeg.AddDays(i);
-                    var sessionDateTimeEnd = sessionDateTimeBeg.Add(film.Duration).AddMinutes(5); 
+                    var sessionDateTimeEnd = sessionDateTimeBeg.Add(film.Duration).AddMinutes(5);
 
                     bool isConflict = allSessions.Any(s =>
                         s.HallId == model.HallId &&
@@ -162,7 +162,7 @@ namespace Web.Controllers
                     return RedirectToAction("ChangeSession");
                 }
 
-                var sessionDateTimeEnd = DateTimeBeg.AddMinutes(film.Duration.TotalMinutes + 5); 
+                var sessionDateTimeEnd = DateTimeBeg.AddMinutes(film.Duration.TotalMinutes + 5);
 
                 var allSessions = await _unitOfWork.Repository<Session>().GetAllAsync(s =>
                     s.Include(session => session.Film)
@@ -174,8 +174,8 @@ namespace Web.Controllers
                                 s.Id != SessionId &&
                                 (
                                     (DateTimeBeg >= s.DateTimeBeg && DateTimeBeg < s.DateTimeEnd) ||
-                                    (sessionDateTimeEnd > s.DateTimeBeg && sessionDateTimeEnd <= s.DateTimeEnd) || 
-                                    (DateTimeBeg <= s.DateTimeBeg && sessionDateTimeEnd >= s.DateTimeEnd) 
+                                    (sessionDateTimeEnd > s.DateTimeBeg && sessionDateTimeEnd <= s.DateTimeEnd) ||
+                                    (DateTimeBeg <= s.DateTimeBeg && sessionDateTimeEnd >= s.DateTimeEnd)
                                 )
                     ).ToList();
 
@@ -271,7 +271,7 @@ namespace Web.Controllers
             return View(model);
         }
 
-        public async Task <IActionResult> DeleteFilm(int page=1, int pageSize = 10)
+        public async Task<IActionResult> DeleteFilm(int page = 1, int pageSize = 10)
         {
             var model = new FilmViewModel();
 
@@ -295,6 +295,43 @@ namespace Web.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> EditFilm(FilmViewModel model)
+        {
+            if (model == null)
+            {
+                return BadRequest("Invalid data.");
+            }
+
+            var film = await _unitOfWork.Repository<Film>().GetByIDAsync(model.Id);
+            if (film == null)
+            {
+                TempData["Error"] = "Film not found.";
+                return RedirectToAction("ChangeFilm");
+            }
+
+            try
+            {
+                film.PosterURL = model.PosterURL;
+                film.TrailerURL = model.TrailerURL;
+                film.Description = model.Description;
+                film.Rating = model.Rating;
+                film.AgeRating = model.AgeRating;
+
+                _unitOfWork.Repository<Film>().UpdateAsync(film);
+                await _unitOfWork.SaveAsync();
+
+                TempData["Success"] = "Film updated successfully!";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating film.");
+                TempData["Error"] = "An error occurred while updating the film.";
+            }
+
+            return RedirectToAction("ChangeFilm");
+        }
+
+        [HttpPost]
         public async Task<IActionResult> DeleteFilmById(int filmId)
         {
             var film = await _unitOfWork.Repository<Film>().GetByIDAsync(filmId);
@@ -309,17 +346,17 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddFilmToDB([FromBody] FilmViewModel model)
         {
-          
+
             if (model == null)
             {
                 return BadRequest("Invalid data.");
             }
 
-        
-            var durationString = model.Duration; 
-            var duration = ConvertDurationToTimeSpan(durationString); 
 
-      
+            var durationString = model.Duration;
+            var duration = ConvertDurationToTimeSpan(durationString);
+
+
             var actorEntities = new List<Actor>();
             foreach (var actorName in model.Actors.Split(','))
             {
@@ -375,7 +412,7 @@ namespace Web.Controllers
                 Description = model.Description,
                 Rating = model.Rating,
                 ReleaseRate = model.ReleaseRate,
-                Duration = duration, 
+                Duration = duration,
                 AgeRating = model.AgeRating,
                 Director = model.Director,
                 Actors = actorEntities,
@@ -388,7 +425,28 @@ namespace Web.Controllers
 
             return Ok(new { message = "Film added successfully!" });
         }
+        public async Task<IActionResult> ChangeFilm(int page = 1, int pageSize = 10)
+        {
+            var model = new FilmViewModel();
 
+            var allFilms = await _unitOfWork.Repository<Film>().GetAllAsync();
+            var allActors = await _unitOfWork.Repository<Actor>().GetAllAsync();
+            var allGenres = await _unitOfWork.Repository<Genre>().GetAllAsync();
+
+            model.AllActors = allActors.ToList();
+            model.AllGenres = allGenres.ToList();
+
+            int totalFilms = allFilms.Count();
+            model.TotalPages = (int)Math.Ceiling(totalFilms / (double)pageSize);
+            model.CurrentPage = page;
+
+            model.AllFilms = allFilms
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return View(model);
+        }
 
 
         //Actor
@@ -410,7 +468,7 @@ namespace Web.Controllers
 
             return View(model);
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> AddActorToDB([FromForm] ActorViewModel model)
         {
@@ -439,7 +497,7 @@ namespace Web.Controllers
 
             return RedirectToAction("AddActor");
         }
-        
+
 
         //Span
         private TimeSpan ConvertDurationToTimeSpan(string duration)

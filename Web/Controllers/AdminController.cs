@@ -35,14 +35,15 @@ namespace Web.Controllers
         public async Task<IActionResult> UserChange(int page = 1, int pageSize = 10)
         {
             var users = await _unitOfWork.Repository<User>()
-                .GetAllAsync(query => query.Include(u => u.UserType)); // Завантажуємо користувачів разом з їхніми ролями
+                .GetAllAsync(query => query.Include(u => u.UserType));
 
-            var roles = await _unitOfWork.Repository<User_Type>().GetAllAsync(); // Завантажуємо всі доступні ролі
-
+            var roles = await _unitOfWork.Repository<User_Type>().GetAllAsync(); 
             int totalUsers = users.Count();
             var model = new UserViewModel
             {
                 AllUsers = users
+                
+                    .OrderBy(u => u.Email)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList(),
@@ -83,6 +84,8 @@ namespace Web.Controllers
             var model = new UserViewModel
             {
                 AllUsers = users
+                
+                    .OrderBy(u => u.Email)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList(),
@@ -116,43 +119,47 @@ namespace Web.Controllers
         //Booking
         public async Task<IActionResult> ChangeBooking(int page = 1, int pageSize = 10)
         {
-            // Використовуємо метод GetAllAsync для отримання всіх бронювань з включенням зв'язків
             var bookings = await _unitOfWork.Repository<Booking>()
                 .GetAllAsync(query => query
-                    .Include(b => b.Status)      // Завантажуємо статус
-                    .Include(b => b.User)        // Завантажуємо користувача
-                    .Include(b => b.Session)     // Завантажуємо сесію
-                    .ThenInclude(s => s.Film)    // Завантажуємо фільм через сесію
+                    .Include(b => b.Status)
+                    .Include(b => b.User)
+                    .Include(b => b.Session)
+                    .ThenInclude(s => s.Film)
                 );
 
-            // Якщо немає бронювань, показуємо повідомлення
-            if (!bookings.Any())
+            var activeBookings = bookings
+                .Where(b => b.Session != null && b.Session.DateTimeEnd > DateTime.Now)
+                .OrderBy(b => b.Session.DateTimeBeg)
+                .ToList();
+
+            if (!activeBookings.Any())
             {
-                TempData["Message"] = "No bookings found.";
+                TempData["Message"] = "No active bookings found.";
             }
 
-            // Завантажуємо список статусів
             var statuses = await _unitOfWork.Repository<Status>().GetAllAsync();
 
-            // Підготовка моделі для перегляду
-            int totalBookings = bookings.Count();
+            int totalBookings = activeBookings.Count;
+            int totalPages = (int)Math.Ceiling(totalBookings / (double)pageSize);
+
+            if (page > totalPages)
+            {
+                page = totalPages > 0 ? totalPages : 1;
+            }
+
             var model = new BookingViewModel
             {
-                AllBookings = bookings
+                AllBookings = activeBookings
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList(),
                 AvailableStatuses = statuses.ToList(),
                 CurrentPage = page,
-                TotalPages = (int)Math.Ceiling(totalBookings / (double)pageSize)
+                TotalPages = totalPages
             };
 
-            // Повертаємо модель в представлення
             return View(model);
         }
-
-
-
 
 
         [HttpPost]
@@ -179,23 +186,35 @@ namespace Web.Controllers
         {
             var films = await _unitOfWork.Repository<Film>().GetAllAsync();
             var halls = await _unitOfWork.Repository<Hall>().GetAllAsync();
-            var allSessions = await _unitOfWork.Repository<Session>().GetAllAsync();
+            var futureSessions = (await _unitOfWork.Repository<Session>().GetAllAsync())
+                .Where(s => s.DateTimeBeg > DateTime.Now)
+                .OrderBy(s => s.DateTimeBeg)
+                .ToList();
 
-            int totalSessions = allSessions.Count();
+            int totalSessions = futureSessions.Count; 
+            int totalPages = (int)Math.Ceiling(totalSessions / (double)pageSize);
+
+            
+            if (page > totalPages)
+            {
+                page = totalPages > 0 ? totalPages : 1;
+            }
+
             var model = new SessionViewModel
             {
                 AllFilms = films.ToList(),
                 AllHalls = halls.ToList(),
-                AllSessions = allSessions
+                AllSessions = futureSessions
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList(),
                 CurrentPage = page,
-                TotalPages = (int)Math.Ceiling(totalSessions / (double)pageSize)
+                TotalPages = totalPages
             };
 
             return View(model);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> AddSessionToDB([FromForm] SessionViewModel model)
@@ -266,28 +285,41 @@ namespace Web.Controllers
 
         public async Task<IActionResult> ChangeSession(int page = 1, int pageSize = 10)
         {
-            // Завантажуємо всі сесії, фільми та зали
+            
             var allSessions = await _unitOfWork.Repository<Session>()
                 .GetAllAsync(s => s.Include(session => session.Film)
                                    .Include(session => session.Hall));
             var allFilms = await _unitOfWork.Repository<Film>().GetAllAsync();
             var allHalls = await _unitOfWork.Repository<Hall>().GetAllAsync();
 
-            int totalSessions = allSessions.Count();
+            var futureSessions = allSessions
+                .Where(s => s.DateTimeBeg > DateTime.Now)
+                .OrderBy(s => s.DateTimeBeg)
+                .ToList();
+
+            int totalSessions = futureSessions.Count;
+            int totalPages = (int)Math.Ceiling(totalSessions / (double)pageSize);
+
+            if (page > totalPages)
+            {
+                page = totalPages > 0 ? totalPages : 1;
+            }
+
             var model = new SessionViewModel
             {
-                AllSessions = allSessions
+                AllSessions = futureSessions
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList(),
                 AllFilms = allFilms.ToList(),
                 AllHalls = allHalls.ToList(),
                 CurrentPage = page,
-                TotalPages = (int)Math.Ceiling(totalSessions / (double)pageSize)
+                TotalPages = totalPages
             };
 
             return View(model);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> UpdateSession(int SessionId, int FilmId, int HallId, DateTime DateTimeBeg, decimal? Price)
@@ -361,21 +393,34 @@ namespace Web.Controllers
             var halls = await _unitOfWork.Repository<Hall>().GetAllAsync();
             var allSessions = await _unitOfWork.Repository<Session>().GetAllAsync();
 
-            int totalSessions = allSessions.Count();
+            var futureSessions = allSessions
+                .Where(s => s.DateTimeBeg > DateTime.Now)
+                .OrderBy(s => s.DateTimeBeg)
+                .ToList();
+
+            int totalSessions = futureSessions.Count;
+            int totalPages = (int)Math.Ceiling(totalSessions / (double)pageSize);
+
+            if (page > totalPages)
+            {
+                page = totalPages > 0 ? totalPages : 1;
+            }
+
             var model = new SessionViewModel
             {
                 AllFilms = films.ToList(),
                 AllHalls = halls.ToList(),
-                AllSessions = allSessions
+                AllSessions = futureSessions
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList(),
                 CurrentPage = page,
-                TotalPages = (int)Math.Ceiling(totalSessions / (double)pageSize)
+                TotalPages = totalPages
             };
 
             return View(model);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> DeleteSessionById(int sessionId)
@@ -433,6 +478,7 @@ namespace Web.Controllers
             model.CurrentPage = page;
 
             model.AllFilms = allFilms
+                .OrderBy(f => f.Name)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -487,16 +533,21 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddFilmToDB([FromBody] FilmViewModel model)
         {
-
             if (model == null)
             {
-                return BadRequest("Invalid data.");
+                return BadRequest(new { message = "Invalid data." });
             }
 
+            var existingFilm = await _unitOfWork.Repository<Film>()
+                .GetFirstOrDefaultAsync(f => f.Name == model.Name);
+
+            if (existingFilm != null)
+            {
+                return BadRequest(new { message = "A film with this name already exists." });
+            }
 
             var durationString = model.Duration;
             var duration = ConvertDurationToTimeSpan(durationString);
-
 
             var actorEntities = new List<Actor>();
             foreach (var actorName in model.Actors.Split(','))
@@ -566,6 +617,8 @@ namespace Web.Controllers
 
             return Ok(new { message = "Film added successfully!" });
         }
+
+
         public async Task<IActionResult> ChangeFilm(int page = 1, int pageSize = 10)
         {
             var model = new FilmViewModel();
@@ -582,6 +635,7 @@ namespace Web.Controllers
             model.CurrentPage = page;
 
             model.AllFilms = allFilms
+                .OrderBy(f => f.Name) 
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -590,54 +644,8 @@ namespace Web.Controllers
         }
 
 
-        //Actor
 
-        public IActionResult AddActor(int page = 1, int pageSize = 10)
-        {
-            var model = new ActorViewModel();
-
-            var allActors = _unitOfWork.Repository<Actor>().GetAllAsync().Result.ToList();
-
-            int totalActors = allActors.Count;
-            model.TotalPages = (int)Math.Ceiling(totalActors / (double)pageSize);
-            model.CurrentPage = page;
-
-            model.AllActors = allActors
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> AddActorToDB([FromForm] ActorViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View("AddActor", model);
-            }
-
-            var actor = new Actor
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-            };
-
-            try
-            {
-                await _unitOfWork.Repository<Actor>().InsertAsync(actor);
-                await _unitOfWork.SaveAsync();
-                TempData["Success"] = "Actor successfully added!";
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while adding actor to the database");
-                TempData["Error"] = "An error occurred while adding the actor. Please try again.";
-            }
-
-            return RedirectToAction("AddActor");
-        }
+       
 
 
         //Span

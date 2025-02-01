@@ -164,9 +164,16 @@
                     Actors: actors
                 })
             })
-                .then(response => response.json())
-                .then(data => alert('Film added successfully!'))
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(result => {
+                    if (result.status === 400) {
+                        alert(result.body.message); // Відобразити повідомлення, якщо фільм вже є
+                    } else {
+                        alert('Film added successfully!');
+                    }
+                })
                 .catch(error => console.error('Error adding film:', error));
         }
+
     </script>
 }

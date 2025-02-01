@@ -31,6 +31,148 @@ namespace Web.Controllers
             return View();
         }
 
+        //User
+        public async Task<IActionResult> UserChange(int page = 1, int pageSize = 10)
+        {
+            var users = await _unitOfWork.Repository<User>()
+                .GetAllAsync(query => query.Include(u => u.UserType)); // Завантажуємо користувачів разом з їхніми ролями
+
+            var roles = await _unitOfWork.Repository<User_Type>().GetAllAsync(); // Завантажуємо всі доступні ролі
+
+            int totalUsers = users.Count();
+            var model = new UserViewModel
+            {
+                AllUsers = users
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList(),
+                AvailableRoles = roles.ToList(),
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling(totalUsers / (double)pageSize)
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeUserRole(int userId, int newRoleId)
+        {
+            var user = await _unitOfWork.Repository<User>().GetByIDAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.TypeId = newRoleId;
+
+            await _unitOfWork.Repository<User>().UpdateAsync(user);
+            await _unitOfWork.SaveAsync(); 
+
+            return RedirectToAction("UserChange");
+        }
+
+
+
+        public async Task<IActionResult> DeleteUser(int page = 1, int pageSize = 10)
+        {
+            var users = await _unitOfWork.Repository<User>().GetAllAsync(query => query.Include(u => u.UserType)); 
+
+            var roles = await _unitOfWork.Repository<User_Type>().GetAllAsync(); 
+
+            int totalUsers = users.Count();
+            var model = new UserViewModel
+            {
+                AllUsers = users
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList(),
+                AvailableRoles = roles.ToList(),
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling(totalUsers / (double)pageSize)
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUserById(int userId)
+        {
+            var user = await _unitOfWork.Repository<User>().GetByIDAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            await _unitOfWork.Repository<User>().DeleteAsync(user);
+            await _unitOfWork.SaveAsync();
+
+            return RedirectToAction("DeleteUser"); 
+        }
+
+
+
+
+        //Booking
+        public async Task<IActionResult> ChangeBooking(int page = 1, int pageSize = 10)
+        {
+            // Використовуємо метод GetAllAsync для отримання всіх бронювань з включенням зв'язків
+            var bookings = await _unitOfWork.Repository<Booking>()
+                .GetAllAsync(query => query
+                    .Include(b => b.Status)      // Завантажуємо статус
+                    .Include(b => b.User)        // Завантажуємо користувача
+                    .Include(b => b.Session)     // Завантажуємо сесію
+                    .ThenInclude(s => s.Film)    // Завантажуємо фільм через сесію
+                );
+
+            // Якщо немає бронювань, показуємо повідомлення
+            if (!bookings.Any())
+            {
+                TempData["Message"] = "No bookings found.";
+            }
+
+            // Завантажуємо список статусів
+            var statuses = await _unitOfWork.Repository<Status>().GetAllAsync();
+
+            // Підготовка моделі для перегляду
+            int totalBookings = bookings.Count();
+            var model = new BookingViewModel
+            {
+                AllBookings = bookings
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList(),
+                AvailableStatuses = statuses.ToList(),
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling(totalBookings / (double)pageSize)
+            };
+
+            // Повертаємо модель в представлення
+            return View(model);
+        }
+
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeBookingStatus(int bookingId, int newStatusId)
+        {
+            var booking = await _unitOfWork.Repository<Booking>().GetByIDAsync(bookingId);
+            if (booking == null)
+            {
+                return NotFound();
+            }
+            booking.StatusId = newStatusId;
+
+            await _unitOfWork.Repository<Booking>().UpdateAsync(booking);
+            await _unitOfWork.SaveAsync();
+
+            return RedirectToAction("ChangeBooking");
+        }
+
+
+
         //Session 
 
         public async Task<IActionResult> AddSession(int page = 1, int pageSize = 10)

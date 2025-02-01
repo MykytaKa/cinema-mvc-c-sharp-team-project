@@ -44,7 +44,7 @@
             @for (int i = 1; i <= Model.TotalPages; i++)
             {
                 <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                    <a class="page-link" asp-action="EditFilm" asp-route-page="@i">@i</a>
+                    <a class="page-link" asp-action="ChangeFilm" asp-route-page="@i">@i</a>
                 </li>
             }
         </ul>

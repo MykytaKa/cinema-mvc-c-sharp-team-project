@@ -4,23 +4,26 @@
 
 <div class="text-center">
     <div class="d-flex justify-content-center flex-wrap gap-3">
-        <!--Create Card-->
+
+        <!--User card-->
+
         <div class="card d-flex align-items-center justify-content-center" style="width: 18rem; background-color: #f8f9fa;">
             <div class="card-body text-center">
-                <h5 class="card-title">Add</h5>
-                <p class="card-text">Add new Film, Actor</p>
+                <h5 class="card-title">Users </h5>
+                <p class="card-text">Change User role, or delete form DataBase</p>
             </div>
             <div class="card-body text-center">
-                <h5 class="card-title">Add Film</h5>
-                <p class="card-text">Add new Film into cinema</p>
-                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="AddFilm">Add</a>
+                <h5 class="card-title">Change User </h5>
+                <p class="card-text">Change User role in DataBase</p>
+                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="UserChange">Delete</a>
             </div>
             <div class="card-body text-center">
-                <h5 class="card-title">Add Actor</h5>
-                <p class="card-text">Add new Actor, if they are not in DataBase</p>
-                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="AddActor">Add</a>
+                <h5 class="card-title">Delete User </h5>
+                <p class="card-text">Delete User from DataBase</p>
+                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="DeleteUser">Delete</a>
             </div>
         </div>
+       
         <!--Session Card-->
         <div class="card d-flex align-items-center justify-content-center" style="width: 18rem; background-color: #f8f9fa;">
             <div class="card-body text-center">
@@ -72,6 +75,17 @@
                 <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="DeleteSession">Delete</a>
             </div>
         </div>
+
+        <!--Create Card-->
+        <div class="card d-flex align-items-center justify-content-center" style="width: 18rem; background-color: #f8f9fa;">
+            <div class="card-body text-center">
+                <h5 class="card-title">Add</h5>
+                <p class="card-text">Add new Film to DataBase</p>
+                <a class="btn btn-primary" asp-area="" asp-controller="Admin" asp-action="AddFilm">AddFilm</a>
+            </div>
+            < 
+        </div>
+    
         <!--Statistic Card-->
         <div class="card d-flex align-items-center justify-content-center" style="width: 18rem; background-color: #f8f9fa;">
             <div class="card-body text-center">

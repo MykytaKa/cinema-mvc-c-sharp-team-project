@@ -18,7 +18,7 @@ namespace Core.Entities
 
         public int HallId { get; set; }
         [ForeignKey("HallId")]
-        public Hall Hall { get; set; }
+        public Hall? Hall { get; set; }
 
         public ICollection<Ticket> Tickets { get; set; }
     }

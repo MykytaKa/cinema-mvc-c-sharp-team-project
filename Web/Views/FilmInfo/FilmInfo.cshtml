@@ -1,16 +1,22 @@
-@model FilmViewModel
+@model Web.Models.FilmViewModel
 
+<div class="filminfo">
+    <h1>Title: @Model.Name </h1>
 <div class="poster">
-    <img src="@film.PosterURL" />
+    <img src="@Model.PosterURL" align = "left"/>
 </div>
 <div class="details">
-    <h1>Title: @film.Name</h1>
-    <p>Director: @film.Director</p>
-    <p>Age Rating: @film.AgeRating</p>
-    <p>Duration: @film.Duration</p>
-    <p>Genre:</p>
-    <p>Actors: </p>
-    <p>Release Date:@film.ReleaseDate()</p>
-    <p>Rating:@film.Rating /10</p>
-    <p>Description:</p>
+    <p>Director: @Model.Director </p>
+    <p>Age Rating: @Model.AgeRating </p>
+    <p>Duration: @Model.Duration </p>
+    <p>Genres: @Model.Genres </p>
+    <p>Actors: @Model.Actors </p>
+    <p>Release Date: @Model.ReleaseRate</p>
+    <p>Rating: @Model.Rating</p>
+    <p>Description: @Model.Description</p>
+</div>
+<div class=" trailer">
+    <h2>Trailer:</h2>
+        <video>@Model.TrailerURL</video>
+</div>
 </div>

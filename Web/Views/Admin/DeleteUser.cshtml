@@ -1,0 +1,49 @@
+﻿@model UserViewModel
+
+<h2>Users List</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.AllUsers)
+        {
+            <tr>
+                <td>@user.FirstName @user.LastName</td>
+                <td>@user.Email</td>
+                <td>@(user.UserType != null ? user.UserType.Name : "No role")</td>
+                <td>
+                    <form asp-action="DeleteUserById" method="post" style="display:inline;">
+                        <input type="hidden" name="userId" value="@user.Id" />
+                        <button type="submit" class="btn btn-danger"
+                                onclick="return confirm('Are you sure you want to delete this user?');">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.TotalPages > 1)
+{
+    <div>
+        <nav>
+            <ul class="pagination">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-action="UserList" asp-route-page="@i">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+}

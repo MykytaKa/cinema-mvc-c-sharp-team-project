@@ -1,0 +1,54 @@
+﻿@model UserViewModel
+
+<h2>Change User Role</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.AllUsers)
+        {
+            <tr>
+                <td>@user.FirstName @user.LastName</td>
+                <td>@user.Email</td>
+                <td>
+                    <form asp-action="ChangeUserRole" method="post" class="d-flex">
+                        <input type="hidden" name="userId" value="@user.Id" />
+                        <select name="newRoleId" class="form-control me-2">
+                            @foreach (var role in Model.AvailableRoles)
+                            {
+                                <option value="@role.Id" selected="@(user.UserType?.Id == role.Id ? "selected" : null)">
+                                    @role.Name
+                                </option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </form>
+                    
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.TotalPages > 1)
+{
+    <div>
+        <nav>
+            <ul class="pagination">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-action="UserChange" asp-route-page="@i">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+}

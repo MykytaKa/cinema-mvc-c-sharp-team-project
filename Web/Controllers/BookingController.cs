@@ -62,6 +62,6 @@ public class BookingController : Controller
         }
 
         Console.WriteLine(" Бронювання успішне! Перенаправлення на сторінку бронювань...");
-        return RedirectToAction("Bookings", new { userId = userId });
+        return RedirectToAction("ShowUserTickets", "Ticket");
     }
 }

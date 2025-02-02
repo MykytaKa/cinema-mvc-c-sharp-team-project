@@ -20,11 +20,12 @@ public class BookingService : IBookingService
         var session = await _unitOfWork.Repository<Session>()
             .GetAsync(s => s.Id == sessionId, includeProperties: "Film,Hall.Seats,Bookings.Tickets.Seat");
 
-        if (session == null || !session.Any()) return null; // Перевірка, чи знайдено сеанс
+        if (!session.Any()) return null; // Перевірка, чи знайдено сеанс
 
         var sessionData = session.First(); // Оскільки GetAsync повертає IEnumerable, беремо перший елемент
 
         var bookedSeatIds = sessionData.Bookings
+            .Where(b => b.StatusId != 3)  // Якщо StatusId = 3, місце НЕ вважається зайнятим
             .SelectMany(b => b.Tickets)
             .Select(t => t.SeatId)
             .ToHashSet();
@@ -38,12 +39,12 @@ public class BookingService : IBookingService
             SessionDate = sessionData.DateTimeBeg,
             SessionPrice = sessionData.Price,
             AvailableSeats = sessionData.Hall.Seats
-                .Where(seat => !bookedSeatIds.Contains(seat.Id))
                 .Select(seat => new SeatViewModel
                 {
                     SeatId = seat.Id,
                     Row = seat.Row,
-                    Column = seat.Column
+                    Column = seat.Column,
+                    IsBooked = bookedSeatIds.Contains(seat.Id)
                 })
                 .ToList()
         };
@@ -78,13 +79,13 @@ public class BookingService : IBookingService
 
     var sessionData = session.First();
 
-    // 🟢 Отримуємо зайняті місця
+    //Отримуємо зайняті місця
     var bookedSeatIds = sessionData.Bookings
         .SelectMany(b => b.Tickets)
         .Select(t => t.SeatId)
         .ToHashSet();
 
-    // 🟢 Перевіряємо, чи вже зайняті місця, які обрав користувач
+    // Перевіряємо, чи вже зайняті місця, які обрав користувач
     var alreadyBookedSeats = bookingDto.SeatIds.Where(seatId => bookedSeatIds.Contains(seatId)).ToList();
     if (alreadyBookedSeats.Any())
     {
@@ -113,10 +114,11 @@ public class BookingService : IBookingService
         Tickets = selectedSeats.Select(seat => new Ticket { SeatId = seat.Id }).ToList()
     };
 
+
     await _unitOfWork.Repository<Booking>().InsertAsync(booking);
     await _unitOfWork.SaveAsync();
 
-    Console.WriteLine("🎉 Бронювання успішне!");
+    Console.WriteLine("Бронювання успішне!");
     return booking;
 }
 

@@ -24,16 +24,18 @@ namespace Web.Controllers
 
             var tickets = await _ticketService.GetTickets(userId, status);
 
-            var ticketViewModels = tickets.Select(ticket => new TicketViewModel
-            {
-                DateTimeBeg = ticket.Booking.Session.DateTimeBeg,
-                FilmTitle = ticket.Booking.Session.Film.Name,
-                FilmPosterURL = ticket.Booking.Session.Film.PosterURL,
-                Column = ticket.Seat.Column,
-                Row = ticket.Seat.Row,
-                HallName = ticket.Seat.Hall.Name,
-                Price = ticket.Booking.Price
-            }).ToList();
+            var ticketViewModels = tickets
+                .OrderBy(t => t.Booking.DateTime)
+                .Select(ticket => new TicketViewModel
+                {
+                    DateTimeBeg = ticket.Booking.Session.DateTimeBeg,
+                    FilmTitle = ticket.Booking.Session.Film.Name,
+                    FilmPosterURL = ticket.Booking.Session.Film.PosterURL,
+                    Column = ticket.Seat.Column,
+                    Row = ticket.Seat.Row,
+                    HallName = ticket.Seat.Hall.Name,
+                    Price = ticket.Booking.Price
+                }).ToList();
 
             return View("Ticket", ticketViewModels);
         }

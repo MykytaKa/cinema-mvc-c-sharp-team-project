@@ -33,6 +33,11 @@ public class SessionService : ISessionService
             sessions = sessions.Where(s => s.DateTimeBeg.Date == filter.SessionDate.Value.Date);
         }
         
+        if (!filter.SessionDate.HasValue)
+        {
+            filter.SessionDate = DateTime.Today;
+        }
+        
         // Фільтрація за часом сеансу (опціонально)
         var now = DateTime.Now;
         
@@ -97,4 +102,27 @@ public class SessionService : ISessionService
             .ToList();
     }
 
+    public async Task<SessionFilterModel> GetFilteredFilmsAsync(SessionFilterModel filter)
+    {
+        // Фільтруємо сеанси через репозиторій
+        var sessions = await GetFilteredSessionsAsync(filter);
+
+        // Групуємо фільми та додаємо до них тільки відфільтровані сеанси
+        var uniqueFilms = sessions
+            .GroupBy(s => s.Film.Id)
+            .Select(g =>
+            {
+                var film = g.First().Film;
+                film.Sessions = g.ToList(); // Додаємо тільки відфільтровані сеанси
+                return film;
+            })
+            .ToList();
+
+        // Заповнюємо фільтр доступними жанрами та віковими рейтингами
+        filter.AvailableGenres = (await GetAllGenresAsync()).ToList();
+        filter.AvailableAgeRatings = (await GetAllAgeRatingsAsync()).ToList();
+        filter.Films = uniqueFilms;
+
+        return filter;
+    }
 }

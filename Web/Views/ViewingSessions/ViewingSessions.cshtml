@@ -19,6 +19,7 @@
 
         <!-- Форма фільтрації -->
         <form method="get" asp-action="ViewingSessions" class="mb-4">
+            <input type="hidden" name="SessionDate" value="@Model.SessionDate?.ToString("yyyy-MM-dd")">
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Movie Name</label>

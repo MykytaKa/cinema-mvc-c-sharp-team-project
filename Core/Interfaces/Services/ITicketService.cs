@@ -9,7 +9,6 @@ namespace Core.Interfaces.Services
 {
     public interface ITicketService
     {
-        IEnumerable<Ticket> GetReservedTickets(int userId);
-        IEnumerable<Ticket> GetUsedTickets(int userId);
+        Task<IEnumerable<Ticket>> GetTickets(int userId, string status);
     }
 }

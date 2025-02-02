@@ -1,5 +1,6 @@
 ﻿using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Web.Models;
 
 namespace Web.Controllers
 {
@@ -12,9 +13,29 @@ namespace Web.Controllers
             _ticketService = ticketService;
         }
 
-        public IActionResult ShowUserTickets()
+        public async Task<IActionResult> ShowUserTickets(string status = "Reserved")
         {
-            return View("Ticket");
+            var userIdClaim = User.FindFirst("UserId")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized("Invalid User ID.");
+            }
+
+            var tickets = await _ticketService.GetTickets(userId, status);
+
+            var ticketViewModels = tickets.Select(ticket => new TicketViewModel
+            {
+                DateTimeBeg = ticket.Booking.Session.DateTimeBeg,
+                FilmTitle = ticket.Booking.Session.Film.Name,
+                FilmPosterURL = ticket.Booking.Session.Film.PosterURL,
+                Column = ticket.Seat.Column,
+                Row = ticket.Seat.Row,
+                HallName = ticket.Seat.Hall.Name,
+                Price = ticket.Booking.Price
+            }).ToList();
+
+            return View("Ticket", ticketViewModels);
         }
     }
 }

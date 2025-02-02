@@ -4,20 +4,40 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Entities;
+using Core.Interfaces;
 using Core.Interfaces.Services;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Services
 {
     public class TicketService : ITicketService
     {
-        public IEnumerable<Ticket> GetReservedTickets(int userId)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public TicketService(IUnitOfWork unitOfWork)
         {
-            
+            _unitOfWork = unitOfWork;
         }
 
-        public IEnumerable<Ticket> GetUsedTickets(int userId)
+        public async Task<IEnumerable<Ticket>> GetTickets(int userId, string status)
         {
-            throw new NotImplementedException();
+            var userBookings = await _unitOfWork.Repository<Booking>().GetAsync(
+                filter: b => b.UserId == userId && b.Status.Name == status
+            );
+
+            var bookingIds = userBookings.Select(b => b.Id).ToList();
+
+            if (!bookingIds.Any())
+            {
+                return new List<Ticket>();
+            }
+
+            var reservedTickets = await _unitOfWork.Repository<Ticket>().GetAsync(
+                filter: t => bookingIds.Contains(t.BookingId),
+                includeProperties: "Seat,Seat.Hall,Booking,Booking.Session,Booking.Session.Film"
+            );
+
+            return reservedTickets;
         }
     }
 }

@@ -15,6 +15,7 @@ namespace Core.Interfaces
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "");
 
+
         Task<TEntity> GetByIDAsync(object id);
 
         Task<IEnumerable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> include = null);

@@ -11,6 +11,7 @@ using System.Text;
 using Infrastructure.Services;
 using Web.Services;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -26,8 +27,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<IFilmInfoService, FilmInfoService>();
 builder.Services.AddScoped<IEmailService, SendGridEmailService>(); // Використання SendGridEmailService
 builder.Services.AddControllersWithViews();
+
 
 var app = builder.Build();
 

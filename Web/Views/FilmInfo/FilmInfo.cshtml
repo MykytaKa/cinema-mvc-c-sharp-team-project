@@ -1,0 +1,32 @@
+@model Core.Entities.Film
+
+<div class="filminfo">
+    <h1>Title: @Model.Name </h1>
+    <div class="poster">
+        <img src="@Model.PosterURL" align="left" width="450" />
+    </div>
+    <div class="details">
+        <p class="fs-4"><strong>Director:</strong> @Model.Director </p>
+        <p class="fs-4"><strong>Age Rating:</strong> @Model.AgeRating </p>
+        <p class="fs-4"><strong>Duration:</strong> @Model.Duration </p>
+        <p class="fs-4"><strong>Genres:</strong> @Model.Genres </p>
+        <p class="fs-4"><strong>Actors:</strong> @Model.Actors </p>
+        <p class="fs-4"><strong>Release Date:</strong> @Model.ReleaseRate</p>
+        <p class="fs-4"><strong>Rating:</strong> @Model.Rating</p>
+        <p class="fs-4"><strong>Description:</strong> @Model.Description</p>
+    </div>
+    <div class=" trailer">
+        <h2>Trailer:</h2>
+        @if (!string.IsNullOrEmpty(@Model.TrailerURL))
+        {
+            <video controls width="600">
+                <source src="@Model.TrailerURL" type="video/webm">
+                Ваш браузер не підтримує відео.
+            </video>
+        }
+        else
+        {
+            <p>Трейлер недоступний</p>
+        }
+    </div>
+</div>

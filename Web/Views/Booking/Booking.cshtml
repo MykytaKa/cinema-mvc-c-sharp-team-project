@@ -27,27 +27,27 @@
 
 <div class="container text-center">
     <h2 class="mb-3">@Model.FilmName</h2>
-    <p><strong>Дата:</strong> @Model.SessionDate.ToString("dd.MM.yyyy HH:mm")</p>
-    <p><strong>Зала:</strong> @Model.HallName</p>
+    <p><strong>Date:</strong> @Model.SessionDate.ToString("dd.MM.yyyy HH:mm")</p>
+    <p><strong>Hall:</strong> @Model.HallName</p>
 
     <!-- Легенда цін -->
     <div class="d-flex justify-content-center align-items-center mb-3">
-        <span class="seat-legend standard"></span> Доступно
-        <span class="seat-legend booked ms-3"></span> Заброньовано
+        <span class="seat-legend standard"></span> @Model.SessionPrice UAH
+        <span class="seat-legend booked ms-3"></span> Reserved
     </div>
 
     <!-- Місця у залі -->
     <form method="post" asp-action="ConfirmBooking">
         <input type="hidden" asp-for="SessionId" />
 
-        <div class="screen text-center mb-4">ЕКРАН</div>
+        <div class="screen text-center mb-4">SCREEN</div>
 
         <div class="seat-container">
-            @foreach (var row in Model.AvailableSeats.GroupBy(s => s.Row).OrderBy(r => r.Key)) // 🔹 Додаємо OrderBy
+            @foreach (var row in Model.AvailableSeats.GroupBy(s => s.Row).OrderBy(r => r.Key)) // Додаємо OrderBy
             {
                 <div class="seat-row">
                     <span class="row-number">@row.Key</span> <!-- Номер ряду -->
-                    @foreach (var seat in row.OrderBy(s => s.Column)) // 🔹 Додаємо сортування місць в рядку
+                    @foreach (var seat in row.OrderBy(s => s.Column)) // Додаємо сортування місць в рядку
                     {
                         var isBooked = seat.IsBooked ? "booked" : "";
                         var isDisabled = seat.IsBooked ? "disabled" : "";
@@ -66,13 +66,13 @@
 
         <!-- Відображення загальної вартості -->
         <div class="total-price mt-3">
-            <strong>Загальна сума: <span id="total-price">0</span> грн</strong>
+            <strong>Total amount: <span id="total-price">0</span> UAH</strong>
         </div>
 
         <!-- Підсвічений номер місця -->
-        <div id="seat-info" class="seat-info">Ряд: -, Місце: -</div>
+        <div id="seat-info" class="seat-info">Row: -, Seat: -</div>
 
-        <button type="submit" class="btn btn-warning btn-lg mt-4">КУПИТИ КВИТКИ</button>
+        <button type="submit" class="btn btn-warning btn-lg mt-4">BUY TICKETS</button>
     </form>
 </div>
 
@@ -185,7 +185,7 @@
         var seatInfo = document.getElementById("seat-info");
 
         if (!seat.classList.contains("booked")) {
-            seatInfo.innerText = `Ряд: ${row}, Місце: ${column}`;
+            seatInfo.innerText = `Row: ${row}, Seat: ${column}`;
             seatInfo.style.display = "block";
         }
     }

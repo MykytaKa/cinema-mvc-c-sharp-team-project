@@ -27,16 +27,14 @@ public class SessionService : ISessionService
             sessions = sessions.Where(s => s.Film.Name.Contains(filter.FilmName, StringComparison.OrdinalIgnoreCase));
         }
         
-        // Фільтрація за датою сеансу
-        if (filter.SessionDate.HasValue)
-        {
-            sessions = sessions.Where(s => s.DateTimeBeg.Date == filter.SessionDate.Value.Date);
-        }
-        
+        // Фільтрує одразу встановлюючи сьогоднішню дату
         if (!filter.SessionDate.HasValue)
         {
             filter.SessionDate = DateTime.Today;
         }
+        
+        // Фільтрація за датою
+        sessions = sessions.Where(s => s.DateTimeBeg.Date == filter.SessionDate.Value.Date);
         
         // Фільтрація за часом сеансу (опціонально)
         var now = DateTime.Now;

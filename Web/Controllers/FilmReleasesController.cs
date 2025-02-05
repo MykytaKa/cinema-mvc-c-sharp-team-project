@@ -4,12 +4,12 @@ using Web.Models;
 
 namespace Web.Controllers
 {
-    public class ReleasesController : Controller
+    public class FilmReleasesController : Controller
     {
         private readonly IReleasesService _releaseService;
-        private readonly ILogger<ReleasesController> _logger;
+        private readonly ILogger<FilmReleasesController> _logger;
 
-        public ReleasesController(IReleasesService releaseService, ILogger<ReleasesController> logger)
+        public FilmReleasesController(IReleasesService releaseService, ILogger<FilmReleasesController> logger)
         {
             _releaseService = releaseService;
             _logger = logger;

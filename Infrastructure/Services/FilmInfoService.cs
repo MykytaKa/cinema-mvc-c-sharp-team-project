@@ -1,6 +1,6 @@
 using Core.Entities;
 using Core.Interfaces;
-using Core.Interfaces.Services;
+using Infrastructure.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +18,14 @@ namespace Infrastructure.Services
             _unitofwork = unitofwork;
         }
 
-        public async Task<Film> GetFilmByIDAsync(object id)
+        public async Task<Film> FilmInfoAsync(int filmId)
         {
-            return await _unitofwork.Repository<Film>().GetByIDAsync(id);
+            var films = await _unitofwork.Repository<Film>().GetAsync(
+                f => f.Id == filmId,  
+                includeProperties: "Genres,Actors"  
+            );
+
+            return films.FirstOrDefault(); 
         }
     }
 }

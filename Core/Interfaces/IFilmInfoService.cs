@@ -10,6 +10,6 @@ namespace Core.Interfaces
 {
     public interface IFilmInfoService
     {
-        Task<Film> GetFilmByIDAsync(object id);
+        Task<Film> FilmInfoAsync(int filmId);
     }
 }

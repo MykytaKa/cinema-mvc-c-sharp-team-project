@@ -1,4 +1,5 @@
 using Core.Interfaces;
+using Core.Models;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,11 +16,12 @@ namespace Web.Controllers
 
         public async Task<IActionResult> FilmInfo(int id)
         {
-            var film = await _filminfo.GetFilmByIDAsync(id);
+            var film = await _filminfo.FilmInfoAsync(id);
             if (film == null)
             {
-                return NotFound();
+                return NotFound(); 
             }
+
             return View(film);
         }
     }

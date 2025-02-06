@@ -125,6 +125,8 @@ namespace Web.Controllers
                     .Include(b => b.User)
                     .Include(b => b.Session)
                     .ThenInclude(s => s.Film)
+                    .Include(b => b.Tickets) // Завантаження квитків
+                    .ThenInclude(t => t.Seat) // Завантаження місць
                 );
 
             var activeBookings = bookings
@@ -146,6 +148,10 @@ namespace Web.Controllers
             {
                 page = totalPages > 0 ? totalPages : 1;
             }
+            var bookingSeats = activeBookings.ToDictionary(
+                booking => booking.Id,
+                booking => booking.Tickets.Select(t => t.Seat).ToList()
+            );
 
             var model = new BookingViewModel
             {
@@ -155,7 +161,8 @@ namespace Web.Controllers
                     .ToList(),
                 AvailableStatuses = statuses.ToList(),
                 CurrentPage = page,
-                TotalPages = totalPages
+                TotalPages = totalPages,
+                BookingSeats = bookingSeats
             };
 
             return View(model);

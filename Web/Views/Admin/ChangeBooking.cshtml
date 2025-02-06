@@ -1,27 +1,41 @@
-﻿@model BookingViewModel
+﻿@using Core.Entities
 
 <h2>Change Booking Status</h2>
-
+<link rel="stylesheet" href="~/css/ChangeSession.css">
 <table class="table table-bordered">
     <thead>
         <tr>
-            
             <th>User</th>
             <th>Film</th>
             <th>Session Time</th>
+            <th class="seats-column">Seats</th> 
             <th>Current Status</th>
             <th>New Status</th>
-            
         </tr>
     </thead>
     <tbody>
         @foreach (var booking in Model.AllBookings)
         {
             <tr>
-               
                 <td>@booking.User.FirstName @booking.User.LastName</td>
                 <td>@booking.Session.Film.Name</td>
                 <td>@booking.Session.DateTimeBeg - @booking.Session.DateTimeEnd</td>
+                <td>
+                    @if (Model.BookingSeats.TryGetValue(booking.Id, out List<Seat> seats) && seats.Any())
+                    {
+                        <span class="seats-list">
+                            @foreach (var seat in seats)
+                            {
+                                <span class="seat-label">Row: @seat.Row, Column: @seat.Column;</span>
+                            }
+                        </span>
+                    }
+                    else
+                    {
+                        <span>No seats reserved</span>
+                    }
+                </td>
+
                 <td>@booking.Status.Name</td>
                 <td>
                     <form asp-action="ChangeBookingStatus" method="post" class="d-flex">
@@ -42,18 +56,5 @@
     </tbody>
 </table>
 
-@if (Model.TotalPages > 1)
-{
-    <div>
-        <nav>
-            <ul class="pagination">
-                @for (int i = 1; i <= Model.TotalPages; i++)
-                {
-                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                        <a class="page-link" asp-action="ChangeBooking" asp-route-page="@i">@i</a>
-                    </li>
-                }
-            </ul>
-        </nav>
-    </div>
-}
+
+

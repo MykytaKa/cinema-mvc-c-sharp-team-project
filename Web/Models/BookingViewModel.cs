@@ -10,6 +10,7 @@ namespace Web.Models
         public List<Status> AvailableStatuses { get; set; }
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }
+        public Dictionary<int, List<Seat>> BookingSeats { get; set; }
     }
 
 }

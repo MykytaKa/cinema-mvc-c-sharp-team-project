@@ -1,0 +1,25 @@
+﻿.session-time-column {
+    width: 150px; 
+}
+
+.action-column {
+    width: 200px; 
+}
+
+.table {
+    width: 100%;
+    table-layout: fixed; 
+}
+
+.seats-column {
+    width: 100px; 
+}
+
+.seats-list {
+    display: inline;
+    white-space: nowrap;
+}
+
+.seat-label {
+    display: block;
+}

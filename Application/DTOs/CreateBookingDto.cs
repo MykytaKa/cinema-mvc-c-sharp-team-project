@@ -1,4 +1,4 @@
-﻿namespace Core.Models;
+﻿namespace Application.DTOs;
 
 public class CreateBookingDto
 {

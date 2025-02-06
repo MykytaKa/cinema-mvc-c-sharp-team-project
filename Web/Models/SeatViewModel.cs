@@ -1,4 +1,4 @@
-﻿namespace Core.Models;
+﻿namespace Web.Models;
 
 public class SeatViewModel
 {

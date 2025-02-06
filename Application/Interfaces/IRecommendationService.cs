@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Core.Entities;
 
-namespace Core.Interfaces.Services
+namespace Application.Interfaces
 {
     public interface IRecommendationService
     {

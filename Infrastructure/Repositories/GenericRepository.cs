@@ -2,8 +2,8 @@
 using Infrastructure.Data;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Core.Interfaces;
 using System.Linq;
+using Application.Interfaces;
 
 namespace Infrastructure.Repositories
 {

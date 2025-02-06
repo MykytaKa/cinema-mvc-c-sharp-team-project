@@ -462,6 +462,7 @@ namespace Web.Controllers
             return View(model);
         }
 
+
         public async Task<IActionResult> DeleteFilm(int page = 1, int pageSize = 10)
         {
             var model = new FilmViewModel();

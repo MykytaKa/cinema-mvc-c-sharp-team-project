@@ -2,13 +2,21 @@
 
 <h2>Edit Film</h2>
 
+<!-- Форма пошуку -->
+<form asp-action="SearchFilm" method="get" class="mb-3">
+    <div class="input-group">
+        
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>Title</th>
             <th>Poster URL</th>
             <th>Trailer URL</th>
-            <th>Description</th>
+            <th style="width: 30%;">Description</th> 
             <th>Rating</th>
             <th>Age Rating</th>
             <th>Actions</th>
@@ -21,14 +29,34 @@
                 <form asp-action="EditFilm" method="post">
                     <input type="hidden" name="Id" value="@film.Id" />
                 <td>@film.Name</td>
-                <td><input type="url" name="PosterURL" value="@film.PosterURL" class="form-control" /></td>
-                <td><input type="url" name="TrailerURL" value="@film.TrailerURL" class="form-control" /></td>
-                <td><textarea name="Description" class="form-control">@film.Description</textarea></td>
+
+                <td>
+                    <input type="url" name="PosterURL" value="@film.PosterURL" class="form-control mb-2" />
+                        @if (!string.IsNullOrEmpty(film.PosterURL))
+                        {
+                        <img src="@film.PosterURL" alt="Poster" style="width: 80px; height: auto; border-radius: 5px;" />
+                        }
+                </td>
+
+                <td>
+                    <input type="url" name="TrailerURL" value="@film.TrailerURL" class="form-control mb-2" />
+                        @if (!string.IsNullOrEmpty(film.TrailerURL))
+                        {
+                        <a href="@film.TrailerURL" target="_blank" class="btn btn-sm btn-link">Watch Trailer</a>
+                        }
+                </td>
+
+                <td>
+                    <textarea name="Description" class="form-control" rows="4">@film.Description</textarea>
+                </td>
+
                 <td>
                     <input type="text" pattern="\d{1,2}[.,]\d{1,2}" name="Rating"
                            value="@film.Rating.ToString("0.0")" class="form-control" />
                 </td>
-                <td><input type="text" name="AgeRating" value="@film.AgeRating" class="form-control" /></td>
+
+                <td><input type="text" name="AgeRating" value="@film.AgeRating" class="form-control" style="width: 120px;" /></td>
+
                 <td>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </td>

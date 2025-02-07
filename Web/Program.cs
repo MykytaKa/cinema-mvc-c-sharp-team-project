@@ -32,6 +32,7 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<IFilmSimilarityUpdateService, FilmSimilarityUpdateService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
+builder.Services.AddScoped<IReleasesService, ReleasesService>();
 builder.Services.AddScoped<IEmailService, SendGridEmailService>(); // Використання SendGridEmailService
 
 builder.Services.AddControllersWithViews();

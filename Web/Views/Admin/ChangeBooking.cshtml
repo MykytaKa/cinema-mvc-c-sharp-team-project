@@ -1,7 +1,7 @@
 ﻿@using Core.Entities
 
 <h2>Change Booking Status</h2>
-<link rel="stylesheet" href="~/css/ChangeSession.css">
+<link rel="stylesheet" href="~/css/ChangeBooking.css" asp-append-version="true" />
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -18,17 +18,23 @@
         {
             <tr>
                 <td>@booking.User.FirstName @booking.User.LastName</td>
-                <td>@booking.Session.Film.Name</td>
-                <td>@booking.Session.DateTimeBeg - @booking.Session.DateTimeEnd</td>
+                <td><div class="film-name">@booking.Session.Film.Name</div></td>
+                <td>
+                    <div>Beg @booking.Session.DateTimeBeg</div>
+                    <div>End @booking.Session.DateTimeEnd</div>
+                </td>
+
                 <td>
                     @if (Model.BookingSeats.TryGetValue(booking.Id, out List<Seat> seats) && seats.Any())
                     {
-                        <span class="seats-list">
-                            @foreach (var seat in seats)
-                            {
-                                <span class="seat-label">Row: @seat.Row, Column: @seat.Column;</span>
-                            }
-                        </span>
+                        <div class="tooltip-container">
+                            <div class="tooltip-content">
+                                @foreach (var seat in seats)
+                                {
+                                    <div>Row: @seat.Row, Col: @seat.Column</div>
+                                }
+                            </div>
+                        </div>
                     }
                     else
                     {
@@ -36,11 +42,13 @@
                     }
                 </td>
 
+
+
                 <td>@booking.Status.Name</td>
                 <td>
                     <form asp-action="ChangeBookingStatus" method="post" class="d-flex">
                         <input type="hidden" name="bookingId" value="@booking.Id" />
-                        <select name="newStatusId" class="form-control me-2">
+                        <select name="newStatusId" class="form-control me-2 bigger-select">
                             @foreach (var status in Model.AvailableStatuses)
                             {
                                 <option value="@status.Id" selected="@(booking.Status?.Id == status.Id ? "selected" : null)">

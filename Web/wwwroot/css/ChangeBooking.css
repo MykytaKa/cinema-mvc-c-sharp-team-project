@@ -1,25 +1,52 @@
-﻿.session-time-column {
-    width: 150px; 
-}
-
-.action-column {
-    width: 200px; 
-}
-
-.table {
+﻿.table {
     width: 100%;
-    table-layout: fixed; 
+}
+    .table th, .table td {
+        padding: 12px;
+        white-space: nowrap;
+    }
+
+        .table th:nth-child(1), .table td:nth-child(1) {
+            width: 25%;
+        }
+
+        .table th:nth-child(2), .table td:nth-child(2) {
+            width: 35%;
+        }
+
+        .table th:nth-child(3), .table td:nth-child(3) {
+            width: 20%;
+        }
+
+        .table th:nth-child(4), .table td:nth-child(4) {
+            width: 10%;
+        }
+
+        .table th:nth-child(5), .table td:nth-child(5) {
+            width: 15%;
+        }
+
+        .table th:nth-child(6), .table td:nth-child(6) {
+            width: 15%;
+        }
+
+
+.tooltip-container:hover .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+}
+td:nth-child(2) {
+    word-wrap: break-word;
+    white-space: normal;
+    max-width: 150px; 
+}
+.film-name {
+    word-break: break-word;
+    white-space: normal;
+}
+.bigger-select {
+    width: 150px;
+    height: 45px;
+    font-size: 18px;
 }
 
-.seats-column {
-    width: 100px; 
-}
-
-.seats-list {
-    display: inline;
-    white-space: nowrap;
-}
-
-.seat-label {
-    display: block;
-}

@@ -23,7 +23,7 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Movie Name</label>
-                    <input type="text" name="FilmName" class="form-control" placeholder="Введіть назву"
+                    <input type="text" name="FilmName" class="form-control" placeholder="Enter the movie"
                            value="@Model?.FilmName">
                 </div>
                 <div class="col-md-4">
@@ -50,11 +50,6 @@
                     <label class="form-label">Rating (max.)</label>
                     <input type="number" name="MaxRating" step="0.1" class="form-control">
                 </div>
-                @* <div class="col-md-4"> *@
-                @*     <label class="form-label">Duration (mm)</label> *@
-                @*     <input type="number" name="MinDuration" class="form-control" placeholder="From"> *@
-                @*     <input type="number" name="MaxDuration" class="form-control mt-2" placeholder="To"> *@
-                @* </div> *@
                 <div class="col-md-4">
                     <label class="form-label">Age Rating</label>
                     <select name="AgeRating" class="form-control">
@@ -95,11 +90,12 @@
                                         <strong>Duration:</strong> @(film?.Duration) хв<br/>
                                         <strong>Age Rating:</strong> @film?.AgeRating
                                     </p>
-                                    <a asp-controller="ViewingSessions" asp-action="ViewingSessions"
-                                       asp-route-id="@film.Id" class="btn btn-primary">
-                                        Movie review
-                                    </a>
+                                    
                                 </div>
+                                <a asp-controller="ViewingSessions" asp-action="ViewingSessions"
+                                   asp-route-id="@if (film != null) { @film.Id }" class="btn btn-primary mt-2 w-50 mx-auto">
+                                    Movie review
+                                </a>
                             </div>
                             <div class="card-footer bg-light">
                                 <h6 class="text-center mb-2">Session:</h6>
@@ -116,10 +112,10 @@
                                                 <li class="list-group-item">
                                                     <strong>Beginning:</strong> @s.DateTimeBeg.ToString("dd.MM.yyyy HH:mm")<br/>
                                                     <strong>End:</strong> @s.DateTimeEnd.ToString("HH:mm")<br/>
-                                                    <strong>Price:</strong> @s.Price.ToString("0.00") грн<br/>
+                                                    <strong>Price:</strong> @s.Price.ToString("0") UAH<br/>
                                                     <strong>Hall:</strong> @s.Hall.Name<br />
                                                     <a asp-controller="Booking" asp-action="BookSession" asp-route-sessionId="@s.Id" class="btn btn-success mt-2">
-                                                        Забронювати
+                                                        Book
                                                     </a>
                                                 </li>
                                                 
@@ -129,7 +125,7 @@
                                     }
                                     else
                                     {
-                                        <p class="text-muted text-center">Немає доступних сеансів</p>
+                                        <p class="text-muted text-center">No sessions available</p>
                                     }
                                 </div>
                             </div>

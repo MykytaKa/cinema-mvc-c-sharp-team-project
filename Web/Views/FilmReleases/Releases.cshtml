@@ -6,6 +6,22 @@
         <div class="col-12 col-sm-8 col-md-6 col-lg-4 text-right">
             <h4 class="new-releases-text">New Releases: @System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(Model.Month) @Model.Year</h4>
         </div>
+        <div class="d-flex justify-content-between mb-3">
+            @if (Model.PrevMonth.HasValue && Model.PrevYear.HasValue)
+            {
+                <a asp-action="Releases" asp-route-month="@Model.PrevMonth" asp-route-year="@Model.PrevYear" class="btn custom-nav-btn">
+                    ← @System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(Model.PrevMonth.Value) @Model.PrevYear
+                </a>
+            }
+            else
+            {
+                <button class="btn btn-secondary" disabled>← Previous</button>
+            }
+
+            <a asp-action="Releases" asp-route-month="@Model.NextMonth" asp-route-year="@Model.NextYear" class="btn custom-nav-btn">
+                @System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(Model.NextMonth) @Model.NextYear →
+            </a>
+        </div>
     </div>
 
     <div class="row justify-content-center">
@@ -197,5 +213,18 @@
     .film-card img {
         max-height: 300px;
         object-fit: cover;
+    }
+
+    .custom-nav-btn {
+        background-color: #262F34;
+        color: white;
+        border-color: #262F34;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .custom-nav-btn:hover {
+        background-color: #3a4750;
+        color: #ffffff;
+        border-color: #3a4750;
     }
 </style>

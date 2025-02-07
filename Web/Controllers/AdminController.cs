@@ -191,7 +191,9 @@ namespace Web.Controllers
 
         public async Task<IActionResult> AddSession(int page = 1, int pageSize = 10)
         {
-            var films = await _unitOfWork.Repository<Film>().GetAllAsync();
+            var films = (await _unitOfWork.Repository<Film>().GetAllAsync())
+        .OrderBy(f => f.Name) 
+        .ToList();
             var halls = await _unitOfWork.Repository<Hall>().GetAllAsync();
             var futureSessions = (await _unitOfWork.Repository<Session>().GetAllAsync())
                 .Where(s => s.DateTimeBeg > DateTime.Now)
@@ -296,7 +298,9 @@ namespace Web.Controllers
             var allSessions = await _unitOfWork.Repository<Session>()
                 .GetAllAsync(s => s.Include(session => session.Film)
                                    .Include(session => session.Hall));
-            var allFilms = await _unitOfWork.Repository<Film>().GetAllAsync();
+            var allFilms = (await _unitOfWork.Repository<Film>().GetAllAsync())
+                .OrderBy(f => f.Name)
+                .ToList();
             var allHalls = await _unitOfWork.Repository<Hall>().GetAllAsync();
 
             var futureSessions = allSessions

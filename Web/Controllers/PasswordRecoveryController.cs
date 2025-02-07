@@ -1,9 +1,9 @@
 using Core.Entities;
-using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Interfaces;
 
 namespace Web.Controllers
 {

@@ -1,6 +1,5 @@
-﻿using System.Security.Claims;
-using Core.Entities;
-using Core.Interfaces;
+﻿
+using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Models;

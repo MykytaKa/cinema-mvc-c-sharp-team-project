@@ -1,8 +1,7 @@
-﻿using Application.Interfaces;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using System.Threading.Tasks;
+using Application.Interfaces;
 
 namespace Application.Services
 {

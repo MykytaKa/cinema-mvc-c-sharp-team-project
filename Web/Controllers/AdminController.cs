@@ -1,9 +1,9 @@
 ﻿using Core.Entities;
-using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
+using Application.Interfaces;
 using Web.Models;
 
 namespace Web.Controllers

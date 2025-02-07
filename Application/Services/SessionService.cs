@@ -1,8 +1,6 @@
-﻿using Core.Entities;
+﻿using Application.Interfaces;
+using Core.Entities;
 using Core.FiltersModels;
-using Application.Interfaces;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace Application.Services;
 

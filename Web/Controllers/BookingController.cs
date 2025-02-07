@@ -1,32 +1,30 @@
-﻿using Core.Interfaces;
-using Core.Models;
+﻿
+using Application.DTOs;
+using Application.Interfaces;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Web.Models;
 
 namespace Web.Controllers
 {
     [Authorize]
-    public class BookingController : Controller
+    public class BookingController(IBookingService bookingService, IMapper mapper) : Controller
     {
-        private readonly IBookingService _bookingService;
-
-        public BookingController(IBookingService bookingService)
-        {
-            _bookingService = bookingService;
-        }
-
         [HttpGet("BookSession")]
         public async Task<IActionResult> BookSession(int sessionId)
         {
-            var model = await _bookingService.PrepareBookingAsync(sessionId);
+            BookSessionDto dto = await bookingService.PrepareBookingAsync(sessionId);
+            BookSessionViewModel viewModel = mapper.Map<BookSessionViewModel>(dto);
 
-            return View("Booking", model);
+            return View("Booking", viewModel);
         }
         
         [HttpPost("ConfirmBooking")]
         public async Task<IActionResult> ConfirmBooking(BookSessionViewModel model)
         {
-            var result = await _bookingService.ConfirmBookingAsync(model, User);
+            var bookingDto = mapper.Map<BookSessionDto>(model);
+            var result = await bookingService.ConfirmBookingAsync(bookingDto, User);
             if (!result.IsSuccess)
             {
                 ModelState.AddModelError("", result.ErrorMessage);

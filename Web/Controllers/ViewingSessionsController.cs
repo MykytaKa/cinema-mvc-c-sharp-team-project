@@ -1,5 +1,5 @@
-﻿using Core.FiltersModels;
-using Core.Interfaces;
+﻿using Application.Interfaces;
+using Core.FiltersModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers;

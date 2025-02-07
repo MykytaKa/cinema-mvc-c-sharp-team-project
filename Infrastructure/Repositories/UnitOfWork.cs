@@ -1,9 +1,7 @@
-﻿using System;
+﻿
 using System.Collections.Concurrent;
-using Core.Entities;
-using Core.Interfaces;
+using Application.Interfaces;
 using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {

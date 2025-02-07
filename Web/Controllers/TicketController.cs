@@ -1,4 +1,4 @@
-﻿using Core.Interfaces.Services;
+﻿using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Web.Models;
 

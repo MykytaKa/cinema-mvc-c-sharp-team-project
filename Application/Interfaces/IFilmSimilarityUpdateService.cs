@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Interfaces.Services
+namespace Application.Interfaces
 {
     public interface IFilmSimilarityUpdateService
     {

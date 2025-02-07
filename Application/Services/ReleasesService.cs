@@ -1,10 +1,9 @@
 ﻿using Core.Entities;
-using Core.Interfaces;
-using Core.Interfaces.Services;
+using Application.Interfaces;
 using Core.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Services
+namespace Application.Services
 {
     public class ReleasesService : IReleasesService
     {

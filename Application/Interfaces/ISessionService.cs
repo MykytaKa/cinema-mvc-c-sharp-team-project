@@ -2,7 +2,7 @@
 using Core.FiltersModels;
 
 
-namespace Core.Interfaces;
+namespace Application.Interfaces;
 
 public interface ISessionService
 {

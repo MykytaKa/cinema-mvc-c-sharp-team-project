@@ -1,10 +1,10 @@
 ﻿using Core.Entities;
 using Core.FiltersModels;
-using Core.Interfaces;
+using Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace Infrastructure.Services;
+namespace Application.Services;
 
 public class SessionService : ISessionService
 {

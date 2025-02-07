@@ -1,9 +1,9 @@
 ﻿using Core.Entities;
-using Core.Interfaces;
+using Application.Interfaces;
 using Core.Models;
 using System.Security.Claims;
 
-namespace Infrastructure.Services
+namespace Application.Services
 {
     public class BookingService : IBookingService
     {

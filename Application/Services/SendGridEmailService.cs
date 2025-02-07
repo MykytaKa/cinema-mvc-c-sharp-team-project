@@ -1,10 +1,10 @@
-﻿using Core.Interfaces;
+﻿using Application.Interfaces;
 using Microsoft.Extensions.Configuration;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Threading.Tasks;
 
-namespace Web.Services
+namespace Application.Services
 {
     public class SendGridEmailService : IEmailService
     {

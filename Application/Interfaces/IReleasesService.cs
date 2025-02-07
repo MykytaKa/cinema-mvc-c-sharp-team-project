@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Core.Entities;
 using Core.Models;
 
-namespace Core.Interfaces.Services
+namespace Application.Interfaces
 {
     public interface IReleasesService
     {

@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Entities;
-using Core.Interfaces;
-using Core.Interfaces.Services;
+using Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
 
-namespace Infrastructure.Services
+namespace Application.Services
 {
     public class RecommendationService : IRecommendationService
     {

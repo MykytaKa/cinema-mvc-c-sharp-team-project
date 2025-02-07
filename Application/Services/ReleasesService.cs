@@ -1,6 +1,6 @@
 ﻿using Core.Entities;
 using Application.Interfaces;
-using Core.Models;
+using Application.DTOs;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services

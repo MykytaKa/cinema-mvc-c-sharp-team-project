@@ -1,4 +1,4 @@
-﻿using Core.Interfaces.Services;
+﻿using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Web.Models;
 
@@ -34,7 +34,7 @@ namespace Web.Controllers
                     Column = ticket.Seat.Column,
                     Row = ticket.Seat.Row,
                     HallName = ticket.Seat.Hall.Name,
-                    Price = ticket.Booking.Price
+                    Price = ticket.Booking.Session.Price
                 }).ToList();
 
             return View("Ticket", ticketViewModels);

@@ -6,7 +6,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Interfaces
+namespace Application.Interfaces
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     {

@@ -1,9 +1,9 @@
 ﻿using Core.Entities;
-using Core.Interfaces;
-using Core.Models;
 using System.Security.Claims;
+using Application.DTOs;
+using Application.Interfaces;
 
-namespace Infrastructure.Services
+namespace Application.Services
 {
     public class BookingService : IBookingService
     {
@@ -15,7 +15,7 @@ namespace Infrastructure.Services
         }
 
         // Метод для підготовки даних для сторінки бронювання
-        public async Task<BookSessionViewModel> PrepareBookingAsync(int sessionId)
+        public async Task<BookSessionDto> PrepareBookingAsync(int sessionId)
         {
             var session = await _unitOfWork.Repository<Session>()
                 .GetAsync(s => s.Id == sessionId, includeProperties: "Film,Hall.Seats,Bookings.Tickets.Seat");
@@ -30,7 +30,7 @@ namespace Infrastructure.Services
                 .Select(t => t.SeatId)
                 .ToHashSet();
 
-            return new BookSessionViewModel
+            return new BookSessionDto()
             {
                 SessionId = sessionData.Id,
                 FilmName = sessionData.Film.Name,
@@ -38,7 +38,7 @@ namespace Infrastructure.Services
                 SessionDate = sessionData.DateTimeBeg,
                 SessionPrice = sessionData.Price,
                 AvailableSeats = sessionData.Hall.Seats
-                    .Select(seat => new SeatViewModel
+                    .Select(seat => new SeatDto()
                     {
                         SeatId = seat.Id,
                         Row = seat.Row,
@@ -54,21 +54,10 @@ namespace Infrastructure.Services
         {
             Console.WriteLine($"➡ Починаємо бронювання: UserId={bookingDto.UserId}, SessionId={bookingDto.SessionId}");
 
-            if (bookingDto.UserId == 0)
-            {
-                Console.WriteLine("Помилка: UserId = 0!");
-                return null;
-            }
-
             var session = await _unitOfWork.Repository<Session>()
                 .GetAsync(s => s.Id == bookingDto.SessionId, includeProperties: "Film,Bookings.Tickets.Seat");
 
             var enumerable = session as Session[] ?? session.ToArray();
-            if (enumerable.Length == 0)
-            {
-                Console.WriteLine("Помилка: Сеанс не знайдено!");
-                return null;
-            }
 
             var sessionData = enumerable.First();
 
@@ -78,24 +67,12 @@ namespace Infrastructure.Services
                 .Select(t => t.SeatId)
                 .ToHashSet();
 
-            var alreadyBookedSeats = bookingDto.SeatIds.Where(seatId => bookedSeatIds.Contains(seatId)).ToList();
-            if (alreadyBookedSeats.Count != 0)
-            {
-                Console.WriteLine($"Помилка: Місця {string.Join(", ", alreadyBookedSeats)} вже зайняті!");
-                return null;
-            }
-
             var selectedSeats = await _unitOfWork.Repository<Seat>()
                 .GetAsync(s => bookingDto.SeatIds.Contains(s.Id));
 
             var seats = selectedSeats as Seat[] ?? selectedSeats.ToArray();
-            if (seats.Length == 0)
-            {
-                Console.WriteLine("Помилка: Жодне місце не знайдено!");
-                return null;
-            }
 
-            var totalPrice = seats.Count() * sessionData.Price;
+            var totalPrice = seats.Length * sessionData.Price;
 
             var booking = new Booking
             {
@@ -115,8 +92,8 @@ namespace Infrastructure.Services
         }
 
         
-        // Новий метод, який переносить логіку з контролера в сервіс
-        public async Task<(bool IsSuccess, string ErrorMessage, Booking? Booking)> ConfirmBookingAsync(BookSessionViewModel model, ClaimsPrincipal user)
+        // Метод, який переносить логіку з контролера в сервіс
+        public async Task<(bool IsSuccess, string ErrorMessage, Booking? Booking)> ConfirmBookingAsync(BookSessionDto model, ClaimsPrincipal user)
         {
             // Перевірка: чи вибрано місця
             if (model.SelectedSeats.Count == 0)

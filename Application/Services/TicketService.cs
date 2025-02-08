@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Interfaces;
 using Core.Entities;
-using Core.Interfaces;
-using Core.Interfaces.Services;
-using Microsoft.AspNetCore.Identity;
 
-namespace Infrastructure.Services
+namespace Application.Services
 {
     public class TicketService : ITicketService
     {

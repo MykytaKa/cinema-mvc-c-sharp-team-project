@@ -1,4 +1,3 @@
-using Core.Interfaces;
 using FluentValidation.AspNetCore;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
@@ -8,9 +7,10 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Infrastructure.Services;
-using Web.Services;
-using Core.Interfaces.Services;
+using Application.Interfaces;
+using Application.Services;
+using Web.Helpers;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +25,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     })
 );
 
-
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
@@ -33,7 +33,9 @@ builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<IFilmSimilarityUpdateService, FilmSimilarityUpdateService>();
 builder.Services.AddScoped<IFilmInfoService, FilmInfoService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
+builder.Services.AddScoped<IReleasesService, ReleasesService>();
 builder.Services.AddScoped<IEmailService, SendGridEmailService>(); // Використання SendGridEmailService
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 

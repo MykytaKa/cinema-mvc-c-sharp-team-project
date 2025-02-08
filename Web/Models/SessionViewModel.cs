@@ -16,7 +16,7 @@ namespace Web.Models
 
         public List<Film> AllFilms { get; set; } = new();
         public List<Hall> AllHalls { get; set; } = new();
-        public List<Session> AllSessions { get; set; } = new(); // Додаємо список сесій
+        public List<Session> AllSessions { get; set; } = new(); 
 
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }

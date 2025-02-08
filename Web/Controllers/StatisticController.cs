@@ -24,12 +24,22 @@ namespace Web.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IActionResult> FilmTicket(int page = 1, string sortBy = "name")
+        public async Task<IActionResult> FilmTicket(int page = 1, string sortBy = "name", DateTime? startDate = null, DateTime? endDate = null)
         {
             var films = await _unitOfWork.Repository<Film>().GetAllAsync();
             var bookings = await _unitOfWork.Repository<Booking>()
                 .GetAllAsync(b => b.Include(x => x.Session));
             var tickets = await _unitOfWork.Repository<Ticket>().GetAllAsync();
+
+            if (startDate.HasValue)
+            {
+                bookings = bookings.Where(b => b.Session.DateTimeBeg >= startDate.Value).ToList();
+            }
+
+            if (endDate.HasValue)
+            {
+                bookings = bookings.Where(b => b.Session.DateTimeBeg <= endDate.Value).ToList();
+            }
 
             var statistics = films.Select(film => new FilmStatisticViewModel
             {
@@ -46,7 +56,7 @@ namespace Web.Controllers
                 "name" => statistics.OrderBy(s => s.FilmName),
                 "minTickets" => statistics.OrderBy(s => s.TicketsSold),
                 "maxTickets" => statistics.OrderByDescending(s => s.TicketsSold),
-                _ => statistics.OrderBy(s => s.FilmName) 
+                _ => statistics.OrderBy(s => s.FilmName)
             };
 
             var totalItems = statistics.Count();
@@ -60,10 +70,81 @@ namespace Web.Controllers
                 Statistics = paginatedStatistics,
                 CurrentPage = page,
                 TotalPages = (int)Math.Ceiling(totalItems / (double)PageSize),
-                SortBy = sortBy
+                SortBy = sortBy,
+                DateTimeBeg = startDate,
+                DateTimeEnd = endDate
             };
 
             return View(viewModel);
+        }
+
+        public async Task<IActionResult> ExportToExcel(string sortBy = "name", DateTime? startDate = null, DateTime? endDate = null)
+        {
+            var films = await _unitOfWork.Repository<Film>().GetAllAsync();
+            var bookings = await _unitOfWork.Repository<Booking>()
+                .GetAllAsync(b => b.Include(x => x.Session));
+            var tickets = await _unitOfWork.Repository<Ticket>().GetAllAsync();
+
+            if (startDate.HasValue)
+            {
+                bookings = bookings.Where(b => b.Session.DateTimeBeg >= startDate.Value).ToList();
+            }
+
+            if (endDate.HasValue)
+            {
+                bookings = bookings.Where(b => b.Session.DateTimeBeg <= endDate.Value).ToList();
+            }
+
+            var statistics = films.Select(film => new FilmStatisticViewModel
+            {
+                FilmName = film.Name,
+                TicketsSold = tickets.Count(ticket =>
+                    bookings.Any(booking =>
+                        booking.Session != null &&
+                        booking.Id == ticket.BookingId &&
+                        booking.Session.FilmId == film.Id))
+            });
+
+            statistics = sortBy switch
+            {
+                "name" => statistics.OrderBy(s => s.FilmName),
+                "minTickets" => statistics.OrderBy(s => s.TicketsSold),
+                "maxTickets" => statistics.OrderByDescending(s => s.TicketsSold),
+                _ => statistics.OrderBy(s => s.FilmName)
+            };
+
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Ticket Sales Statistics");
+                worksheet.Cell(1, 1).Value = "Film";
+                worksheet.Cell(1, 2).Value = "Tickets Sold";
+
+                int row = 2;
+                foreach (var film in statistics)
+                {
+                    worksheet.Cell(row, 1).Value = film.FilmName;
+                    worksheet.Cell(row, 2).Value = film.TicketsSold;
+                    row++;
+                }
+
+                string filedate = DateTime.Now.ToString("__HH.mm dd.MM.yyyy");
+                string filterInfo = "";
+
+                if (startDate.HasValue || endDate.HasValue)
+                {
+                    filterInfo = $"_from-{startDate?.ToString("dd-MM-yyyy") ?? "start"}-to-{endDate?.ToString("dd-MM-yyyy") ?? "end"}";
+                }
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    return File(stream.ToArray(),
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                $"TicketSalesStatistics{filterInfo}{filedate}.xlsx");
+                }
+            }
         }
 
         public async Task<IActionResult> FilmOccupancy(int page = 1, string sortBy = "name", DateTime? startDate = null, DateTime? endDate = null)
@@ -136,58 +217,6 @@ namespace Web.Controllers
 
             return View(viewModel);
         }
-
-
-        public async Task<IActionResult> ExportToExcel(string sortBy = "name")
-        {
-            var films = await _unitOfWork.Repository<Film>().GetAllAsync();
-            var bookings = await _unitOfWork.Repository<Booking>()
-                .GetAllAsync(b => b.Include(x => x.Session));
-            var tickets = await _unitOfWork.Repository<Ticket>().GetAllAsync();
-
-            var statistics = films.Select(film => new FilmStatisticViewModel
-            {
-                FilmName = film.Name,
-                TicketsSold = tickets.Count(ticket =>
-                    bookings.Any(booking =>
-                        booking.Session != null &&
-                        booking.Id == ticket.BookingId &&
-                        booking.Session.FilmId == film.Id))
-            });
-
-            statistics = sortBy switch
-            {
-                "name" => statistics.OrderBy(s => s.FilmName),
-                "minTickets" => statistics.OrderBy(s => s.TicketsSold),
-                "maxTickets" => statistics.OrderByDescending(s => s.TicketsSold),
-                _ => statistics.OrderBy(s => s.FilmName)
-            };
-
-            using (var workbook = new XLWorkbook())
-            {
-                var worksheet = workbook.Worksheets.Add("Ticket Sales Statistics");
-                worksheet.Cell(1, 1).Value = "Film";
-                worksheet.Cell(1, 2).Value = "Tickets Sold";
-
-                int row = 2;
-                foreach (var film in statistics)
-                {
-                    worksheet.Cell(row, 1).Value = film.FilmName;
-                    worksheet.Cell(row, 2).Value = film.TicketsSold;
-                    row++;
-                }
-                string filedate = DateTime.Now.ToString("__HH.mm dd.MM.yyyy");
-                using (var stream = new MemoryStream())
-                {
-                    workbook.SaveAs(stream);
-                    stream.Seek(0, SeekOrigin.Begin);
-
-                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TicketSalesStatistics_{filedate}.xlsx");
-                }
-            }
-
-        }
-
         public async Task<IActionResult> ExportOccupancyToExcel(string sortBy = "name", DateTime? startDate = null, DateTime? endDate = null)
         {
             var films = await _unitOfWork.Repository<Film>().GetAllAsync();

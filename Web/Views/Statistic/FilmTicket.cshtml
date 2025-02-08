@@ -1,25 +1,38 @@
 ﻿@model Web.Models.FilmStatisticListViewModel
 
-<h2>Ticket sales statistics</h2>
+<h2>Ticket Sales Statistics</h2>
 
 <form method="get" asp-action="FilmTicket" class="mb-3 d-flex">
     <label class="me-2">Sort by:</label>
-    <select name="sortBy" class="form-control me-2" onchange="this.form.submit()">
+    <select name="sortBy" class="form-control me-2">
         <option value="name" selected="@(Model.SortBy == "name" ? "selected" : null)">A-Z</option>
         <option value="maxTickets" selected="@(Model.SortBy == "maxTickets" ? "selected" : null)">Most Tickets Sold</option>
         <option value="minTickets" selected="@(Model.SortBy == "minTickets" ? "selected" : null)">Fewest Tickets Sold</option>
     </select>
+
+    <label class="ms-3 me-2">From:</label>
+    <input type="date" name="startDate" value="@Model.DateTimeBeg?.ToString("yyyy-MM-dd")" class="form-control me-2" />
+
+    <label class="me-2">To:</label>
+    <input type="date" name="endDate" value="@Model.DateTimeEnd?.ToString("yyyy-MM-dd")" class="form-control me-2" />
+
+    <button type="submit" class="btn btn-primary me-2">Filter</button>
+
+    <a asp-action="FilmTicket" class="btn btn-secondary">Reset Filters</a>
 </form>
 
 <form method="get" asp-action="ExportToExcel" class="mb-3">
-    <button type="submit" class="btn btn-primary">Download as Excel</button>
+    <input type="hidden" name="sortBy" value="@Model.SortBy" />
+    <input type="hidden" name="startDate" value="@Model.DateTimeBeg?.ToString("yyyy-MM-dd")" />
+    <input type="hidden" name="endDate" value="@Model.DateTimeEnd?.ToString("yyyy-MM-dd")" />
+    <button type="submit" class="btn btn-success">Download as Excel</button>
 </form>
 
 <table class="table table-bordered">
     <thead class="table-dark">
         <tr>
             <th>Film</th>
-            <th>Ticket sold</th>
+            <th>Tickets Sold</th>
         </tr>
     </thead>
     <tbody>
@@ -40,7 +53,7 @@
             @for (int i = 1; i <= Model.TotalPages; i++)
             {
                 <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                    <a class="page-link" asp-action="FilmTicket" asp-route-page="@i" asp-route-sortBy="@Model.SortBy">@i</a>
+                    <a class="page-link" asp-action="FilmTicket" asp-route-page="@i" asp-route-sortBy="@Model.SortBy" asp-route-startDate="@Model.DateTimeBeg?.ToString("yyyy-MM-dd")" asp-route-endDate="@Model.DateTimeEnd?.ToString("yyyy-MM-dd")">@i</a>
                 </li>
             }
         </ul>

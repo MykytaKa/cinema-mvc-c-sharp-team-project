@@ -124,6 +124,8 @@ namespace Web.Controllers
                     .Include(b => b.User)
                     .Include(b => b.Session)
                     .ThenInclude(s => s.Film)
+                    .Include(b => b.Tickets) // Завантаження квитків
+                    .ThenInclude(t => t.Seat) // Завантаження місць
                 );
 
             var activeBookings = bookings
@@ -145,6 +147,10 @@ namespace Web.Controllers
             {
                 page = totalPages > 0 ? totalPages : 1;
             }
+            var bookingSeats = activeBookings.ToDictionary(
+                booking => booking.Id,
+                booking => booking.Tickets.Select(t => t.Seat).ToList()
+            );
 
             var model = new BookingViewModel
             {
@@ -154,7 +160,8 @@ namespace Web.Controllers
                     .ToList(),
                 AvailableStatuses = statuses.ToList(),
                 CurrentPage = page,
-                TotalPages = totalPages
+                TotalPages = totalPages,
+                BookingSeats = bookingSeats
             };
 
             return View(model);
@@ -183,7 +190,9 @@ namespace Web.Controllers
 
         public async Task<IActionResult> AddSession(int page = 1, int pageSize = 10)
         {
-            var films = await _unitOfWork.Repository<Film>().GetAllAsync();
+            var films = (await _unitOfWork.Repository<Film>().GetAllAsync())
+        .OrderBy(f => f.Name) 
+        .ToList();
             var halls = await _unitOfWork.Repository<Hall>().GetAllAsync();
             var futureSessions = (await _unitOfWork.Repository<Session>().GetAllAsync())
                 .Where(s => s.DateTimeBeg > DateTime.Now)
@@ -288,7 +297,9 @@ namespace Web.Controllers
             var allSessions = await _unitOfWork.Repository<Session>()
                 .GetAllAsync(s => s.Include(session => session.Film)
                                    .Include(session => session.Hall));
-            var allFilms = await _unitOfWork.Repository<Film>().GetAllAsync();
+            var allFilms = (await _unitOfWork.Repository<Film>().GetAllAsync())
+                .OrderBy(f => f.Name)
+                .ToList();
             var allHalls = await _unitOfWork.Repository<Hall>().GetAllAsync();
 
             var futureSessions = allSessions
@@ -460,6 +471,7 @@ namespace Web.Controllers
 
             return View(model);
         }
+
 
         public async Task<IActionResult> DeleteFilm(int page = 1, int pageSize = 10)
         {

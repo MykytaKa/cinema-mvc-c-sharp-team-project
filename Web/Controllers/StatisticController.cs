@@ -274,6 +274,45 @@ namespace Web.Controllers
             }
         }
 
+        public async Task<IActionResult> SessionPopularity(DateTime? startDate = null, DateTime? endDate = null)
+        {
+            var bookings = await _unitOfWork.Repository<Booking>()
+                .GetAllAsync(b => b.Include(x => x.Session));
+
+            if (startDate.HasValue)
+            {
+                bookings = bookings.Where(b => b.Session.DateTimeBeg >= startDate.Value).ToList();
+            }
+
+            if (endDate.HasValue)
+            {
+                bookings = bookings.Where(b => b.Session.DateTimeBeg <= endDate.Value).ToList();
+            }
+
+            var sessionTimes = bookings.GroupBy(b =>
+            {
+                var hour = b.Session.DateTimeBeg.Hour;
+                if (hour >= 6 && hour < 12) return "Morning (6 AM - 12 PM)";
+                if (hour >= 12 && hour < 18) return "Afternoon (12 PM - 6 PM)";
+                if (hour >= 18 && hour < 24) return "Evening (6 PM - 12 AM)";
+                return "Night (12 AM - 6 AM)";
+            })
+            .Select(g => new SessionPopularityViewModel
+            {
+                TimePeriod = g.Key,
+                TotalBookings = g.Count()
+            })
+            .OrderByDescending(s => s.TotalBookings)
+            .ToList();
+
+            return View(new SessionPopularityListViewModel
+            {
+                Statistics = sessionTimes,
+                DateTimeBeg = startDate,
+                DateTimeEnd = endDate
+            });
+        }
+
 
 
     }

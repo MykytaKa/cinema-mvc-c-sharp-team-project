@@ -1,0 +1,48 @@
+﻿@model Web.Models.FilmStatisticListViewModel
+
+<h2>Ticket sales statistics</h2>
+
+<form method="get" asp-action="FilmTicket" class="mb-3 d-flex">
+    <label class="me-2">Sort by:</label>
+    <select name="sortBy" class="form-control me-2" onchange="this.form.submit()">
+        <option value="name" selected="@(Model.SortBy == "name" ? "selected" : null)">A-Z</option>
+        <option value="maxTickets" selected="@(Model.SortBy == "maxTickets" ? "selected" : null)">Most Tickets Sold</option>
+        <option value="minTickets" selected="@(Model.SortBy == "minTickets" ? "selected" : null)">Fewest Tickets Sold</option>
+    </select>
+</form>
+
+<form method="get" asp-action="ExportToExcel" class="mb-3">
+    <button type="submit" class="btn btn-primary">Download as Excel</button>
+</form>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Film</th>
+            <th>Ticket sold</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var film in Model.Statistics)
+        {
+            <tr>
+                <td>@film.FilmName</td>
+                <td>@film.TicketsSold</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination">
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="FilmTicket" asp-route-page="@i" asp-route-sortBy="@Model.SortBy">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

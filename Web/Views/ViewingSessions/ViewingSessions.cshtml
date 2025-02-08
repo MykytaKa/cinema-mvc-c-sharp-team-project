@@ -90,12 +90,11 @@
                                         <strong>Duration:</strong> @(film?.Duration) хв<br/>
                                         <strong>Age Rating:</strong> @film?.AgeRating
                                     </p>
-                                    
+                                    <a asp-controller="ViewingSessions" asp-action="ViewingSessions"
+                                       asp-route-id="@film.Id" class="btn btn-primary">
+                                        Movie review
+                                    </a>
                                 </div>
-                                <a asp-controller="ViewingSessions" asp-action="ViewingSessions"
-                                   asp-route-id="@if (film != null) { @film.Id }" class="btn btn-primary mt-2 w-50 mx-auto">
-                                    Movie review
-                                </a>
                             </div>
                             <div class="card-footer bg-light">
                                 <h6 class="text-center mb-2">Session:</h6>

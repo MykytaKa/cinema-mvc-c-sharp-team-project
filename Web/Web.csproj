@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Models\SessionPopularityViewModel.сs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
@@ -16,6 +20,7 @@
   <ItemGroup>
 	<PackageReference Include="AutoMapper" Version="13.0.1" />
 	<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+	<PackageReference Include="ClosedXML" Version="0.104.2" />
 	<PackageReference Include="FluentValidation" Version="11.11.0" />
 	<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
 	<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />  

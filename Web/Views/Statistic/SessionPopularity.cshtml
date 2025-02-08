@@ -1,0 +1,32 @@
+﻿@model Web.Models.SessionPopularityListViewModel
+
+<h2>Session Popularity</h2>
+
+<form method="get" asp-action="SessionPopularity" class="mb-3 d-flex">
+    <label class="me-2">From:</label>
+    <input type="date" name="startDate" value="@Model.DateTimeBeg?.ToString("yyyy-MM-dd")" class="form-control me-2" />
+
+    <label class="me-2">To:</label>
+    <input type="date" name="endDate" value="@Model.DateTimeEnd?.ToString("yyyy-MM-dd")" class="form-control me-2" />
+
+    <button type="submit" class="btn btn-primary me-2">Filter</button>
+    <a asp-action="SessionPopularity" class="btn btn-secondary">Reset Filters</a>
+</form>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Time Period</th>
+            <th>Total Bookings</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var period in Model.Statistics)
+        {
+            <tr>
+                <td>@period.TimePeriod</td>
+                <td>@period.TotalBookings</td>
+            </tr>
+        }
+    </tbody>
+</table>

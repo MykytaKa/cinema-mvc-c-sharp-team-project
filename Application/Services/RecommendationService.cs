@@ -68,7 +68,7 @@ namespace Application.Services
             }
 
             // 4. Filter by similarity threshold and return the result
-            const double similarityThreshold = 0.0;
+            const double similarityThreshold = 0.3;
             _logger.LogInformation("Filtering films with similarity above {SimilarityThreshold}.", similarityThreshold);
 
             var filteredRecommendations = recommendedFilms

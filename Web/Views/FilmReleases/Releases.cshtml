@@ -4,7 +4,7 @@
     <div class="row justify-content-start mb-4">
         <!-- Текст новинок -->
         <div class="col-12 col-sm-8 col-md-6 col-lg-4 text-right">
-            <h4 class="new-releases-text">New Releases: @System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(Model.Month) @Model.Year</h4>
+            <h4 class="new-releases-text">New Releases: @System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(Model.Month)<br />@Model.Year</h4>
         </div>
         <div class="d-flex justify-content-between mb-3">
             @if (Model.PrevMonth.HasValue && Model.PrevYear.HasValue)
@@ -31,13 +31,13 @@
                 @foreach (var film in Model.FilmDTOs)
                 {
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-                        <div class="card text-center film-card shadow-sm">
+                        <a asp-controller="FilmInfo" asp-action="FilmInfo" asp-route-id="@film.Id" class="card text-center film-card shadow-sm" style="text-decoration: none;">
                             <img src="@film.PosterURL" class="card-img-top" alt="@film.Name" style="max-height: 300px; object-fit: cover;">
                             <div class="card-body">
                                 <h5 class="card-title film-name">@film.Name</h5>
                                 <h5 class="card-title release-date">@film.RealeaseDate.ToString("dd.MM.yyyy")</h5>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 }
             </div>
@@ -157,7 +157,7 @@
         text-transform: uppercase;
         margin-bottom: 15px;
         text-align: center;
-        color: var(--black-color);
+        color: black;
     }
 
     .form-group label {
@@ -186,9 +186,9 @@
     .film-card {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         border: 1px solid var(--black-color);
-        background-color: var(--skin-color);
+        background-color: white;
         height: 450px;
-        width: 100%; /* Забезпечує заповнення доступної ширини */
+        width: 100%;
     }
 
     .film-card

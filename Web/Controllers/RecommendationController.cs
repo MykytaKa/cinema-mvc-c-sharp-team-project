@@ -47,6 +47,7 @@ namespace Web.Controllers
                 _logger.LogDebug("Mapping recommended films to view models...");
                 var recoFilmModels = recoFilms.Select(f => new FilmRecoViewModel
                 {
+                    Id = f.Id,
                     Title = f.Name,
                     PosterUrl = f.PosterURL
                 }).ToList();

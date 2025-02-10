@@ -73,7 +73,7 @@
 
         <!-- Виведення фільмів -->
         <div id="moviesContainer" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            @if (Model.Films != null && Model.Films.Any())
+            @if (Model.Films.Any())
             {
                 @foreach (var film in Model.Films)
                 {
@@ -86,9 +86,9 @@
                                     <h5 class="card-title text-center">@film.Name</h5>
                                     <p class="card-text">
                                         <strong>Genres:</strong> @(film?.Genres != null ? string.Join(", ", film.Genres.Select(g => g.Name)) : "Немає жанрів")<br/>
-                                        <strong>Rating:</strong> @(film?.Rating)<br/>
+                                        <strong>Rating:</strong> @(film?.Rating>0 ? film.Rating.ToString("0.0") : "Unrated")<br/>
                                         <strong>Duration:</strong> @(film?.Duration) хв<br/>
-                                        <strong>Age Rating:</strong> @film?.AgeRating
+                                        <strong>Age Rating:</strong> @(film?.AgeRating != "N/A" ? film?.AgeRating : "Unrated")
                                     </p>
                                     <a asp-controller="FilmInfo" asp-action="FilmInfo"
                                        asp-route-id="@film.Id" class="btn btn-primary">

@@ -45,6 +45,25 @@ namespace Infrastructure.Repositories
             }
         }
 
+        public virtual IQueryable<TEntity> GetQueryable(
+            Expression<Func<TEntity, bool>>? filter = null,
+            string includeProperties = "")
+        {
+            IQueryable<TEntity> query = _dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            return query;
+        }
+
         public virtual async Task<TEntity> GetByIDAsync(object id, string includeProperties = "")
         {
             IQueryable<TEntity> query = _dbSet;

@@ -15,6 +15,10 @@ namespace Application.Interfaces
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "");
 
+        public IQueryable<TEntity> GetQueryable(
+            Expression<Func<TEntity, bool>>? filter = null,
+            string includeProperties = "");
+
         Task<TEntity> GetByIDAsync(object id, string includeProperties = "");
 
         Task<IEnumerable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> include = null);

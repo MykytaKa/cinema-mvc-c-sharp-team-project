@@ -34,4 +34,5 @@ public class UserViewModel
 
     public List<User> AllUsers { get; set; } = new List<User>();
     public List<User_Type> AvailableRoles { get; set; } = new List<User_Type>();
+    public string SearchQuery { get; set; }
 }

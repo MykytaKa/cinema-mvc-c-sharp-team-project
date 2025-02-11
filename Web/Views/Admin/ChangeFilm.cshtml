@@ -2,7 +2,13 @@
 
 <h2>Edit Film</h2>
 
-
+<form method="get" asp-action="ChangeFilm">
+    <div class="input-group mb-3">
+        <input type="text" name="searchQuery" value="@Model.SearchQuery" class="form-control" placeholder="Search film by title..." />
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a href="@Url.Action("ChangeFilm")" class="btn btn-secondary">Reset</a>
+    </div>
+</form>
 
 <table class="table table-bordered">
     <thead>
@@ -10,7 +16,7 @@
             <th>Title</th>
             <th>Poster URL</th>
             <th>Trailer URL</th>
-            <th style="width: 30%;">Description</th> 
+            <th style="width: 30%;">Description</th>
             <th>Rating</th>
             <th>Age Rating</th>
             <th>Actions</th>
@@ -23,7 +29,6 @@
                 <form asp-action="EditFilm" method="post">
                     <input type="hidden" name="Id" value="@film.Id" />
                 <td>@film.Name</td>
-
                 <td>
                     <input type="url" name="PosterURL" value="@film.PosterURL" class="form-control mb-2" />
                         @if (!string.IsNullOrEmpty(film.PosterURL))
@@ -31,7 +36,6 @@
                         <img src="@film.PosterURL" alt="Poster" style="width: 80px; height: auto; border-radius: 5px;" />
                         }
                 </td>
-
                 <td>
                     <input type="url" name="TrailerURL" value="@film.TrailerURL" class="form-control mb-2" />
                         @if (!string.IsNullOrEmpty(film.TrailerURL))
@@ -39,18 +43,14 @@
                         <a href="@film.TrailerURL" target="_blank" class="btn btn-sm btn-link">Watch Trailer</a>
                         }
                 </td>
-
                 <td>
                     <textarea name="Description" class="form-control" rows="4">@film.Description</textarea>
                 </td>
-
                 <td>
                     <input type="text" pattern="\d{1,2}[.,]\d{1,2}" name="Rating"
                            value="@film.Rating.ToString("0.0")" class="form-control" />
                 </td>
-
                 <td><input type="text" name="AgeRating" value="@film.AgeRating" class="form-control" style="width: 120px;" /></td>
-
                 <td>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </td>
@@ -66,7 +66,7 @@
             @for (int i = 1; i <= Model.TotalPages; i++)
             {
                 <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                    <a class="page-link" asp-action="ChangeFilm" asp-route-page="@i">@i</a>
+                    <a class="page-link" asp-action="ChangeFilm" asp-route-page="@i" asp-route-searchQuery="@Model.SearchQuery">@i</a>
                 </li>
             }
         </ul>

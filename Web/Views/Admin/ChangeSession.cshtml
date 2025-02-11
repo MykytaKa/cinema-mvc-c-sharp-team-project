@@ -1,6 +1,13 @@
 ﻿@model Web.Models.SessionViewModel
 
 <h2>Existing Sessions</h2>
+<form method="get" asp-action="ChangeSession">
+    <div class="input-group mb-3">
+        <input type="text" name="searchQuery" value="@Model.SearchQuery" class="form-control" placeholder="Search film by title..." />
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a href="@Url.Action("ChangeSession")" class="btn btn-secondary">Reset</a>
+    </div>
+</form>
 <link rel="stylesheet" href="~/css/ChangeSession.css" asp-append-version="true" />
 <table class="table">
     <thead>

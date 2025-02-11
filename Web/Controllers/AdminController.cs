@@ -12,7 +12,7 @@ namespace Web.Controllers
     {
         private readonly ILogger<AdminController> _logger;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly string _apiKey = "c8a260e94876a3a04f0317efa68269ac";
+        
         private readonly IConfiguration _configuration;
         private readonly IFilmSimilarityUpdateService _filmSimilarityUpdateService;
 
@@ -31,12 +31,19 @@ namespace Web.Controllers
         }
 
         //User
-        public async Task<IActionResult> UserChange(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> UserChange(int page = 1, int pageSize = 10, string searchQuery = "")
         {
             var users = await _unitOfWork.Repository<User>()
                 .GetAllAsync(query => query.Include(u => u.UserType));
 
-            var roles = await _unitOfWork.Repository<User_Type>().GetAllAsync(); 
+            var roles = await _unitOfWork.Repository<User_Type>().GetAllAsync();
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                users = users.Where(u =>
+                    $"{u.FirstName} {u.LastName}".Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
             int totalUsers = users.Count();
             var model = new UserViewModel
             {
@@ -48,7 +55,8 @@ namespace Web.Controllers
                     .ToList(),
                 AvailableRoles = roles.ToList(),
                 CurrentPage = page,
-                TotalPages = (int)Math.Ceiling(totalUsers / (double)pageSize)
+                TotalPages = (int)Math.Ceiling(totalUsers / (double)pageSize),
+                SearchQuery = searchQuery
             };
 
             return View(model);
@@ -73,28 +81,37 @@ namespace Web.Controllers
 
 
 
-        public async Task<IActionResult> DeleteUser(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> DeleteUser(int page = 1, int pageSize = 10, string searchQuery = "")
         {
-            var users = await _unitOfWork.Repository<User>().GetAllAsync(query => query.Include(u => u.UserType)); 
+            var users = await _unitOfWork.Repository<User>().GetAllAsync(query => query.Include(u => u.UserType));
 
-            var roles = await _unitOfWork.Repository<User_Type>().GetAllAsync(); 
+            var roles = await _unitOfWork.Repository<User_Type>().GetAllAsync();
+
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                users = users.Where(u =>
+                    $"{u.FirstName} {u.LastName}".Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
 
             int totalUsers = users.Count();
             var model = new UserViewModel
             {
                 AllUsers = users
-                
                     .OrderBy(u => u.Email)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList(),
                 AvailableRoles = roles.ToList(),
                 CurrentPage = page,
-                TotalPages = (int)Math.Ceiling(totalUsers / (double)pageSize)
+                TotalPages = (int)Math.Ceiling(totalUsers / (double)pageSize),
+                SearchQuery = searchQuery
             };
 
             return View(model);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> DeleteUserById(int userId)
@@ -116,7 +133,7 @@ namespace Web.Controllers
 
 
         //Booking
-        public async Task<IActionResult> ChangeBooking(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> ChangeBooking(int page = 1, int pageSize = 10, string searchQuery = "")
         {
             var bookings = await _unitOfWork.Repository<Booking>()
                 .GetAllAsync(query => query
@@ -124,14 +141,22 @@ namespace Web.Controllers
                     .Include(b => b.User)
                     .Include(b => b.Session)
                     .ThenInclude(s => s.Film)
-                    .Include(b => b.Tickets) // Завантаження квитків
-                    .ThenInclude(t => t.Seat) // Завантаження місць
+                    .Include(b => b.Tickets)
+                    .ThenInclude(t => t.Seat)
                 );
 
             var activeBookings = bookings
                 .Where(b => b.Session != null && b.Session.DateTimeEnd > DateTime.Now)
                 .OrderBy(b => b.Session.DateTimeBeg)
                 .ToList();
+
+           
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                activeBookings = activeBookings
+                    .Where(b => $"{b.User.FirstName} {b.User.LastName}".Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
 
             if (!activeBookings.Any())
             {
@@ -147,6 +172,7 @@ namespace Web.Controllers
             {
                 page = totalPages > 0 ? totalPages : 1;
             }
+
             var bookingSeats = activeBookings.ToDictionary(
                 booking => booking.Id,
                 booking => booking.Tickets.Select(t => t.Seat).ToList()
@@ -161,11 +187,13 @@ namespace Web.Controllers
                 AvailableStatuses = statuses.ToList(),
                 CurrentPage = page,
                 TotalPages = totalPages,
-                BookingSeats = bookingSeats
+                BookingSeats = bookingSeats,
+                SearchQuery = searchQuery 
             };
 
             return View(model);
         }
+
 
 
         [HttpPost]
@@ -291,9 +319,8 @@ namespace Web.Controllers
             return RedirectToAction("AddSession");
         }
 
-        public async Task<IActionResult> ChangeSession(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> ChangeSession(int page = 1, int pageSize = 10, string searchQuery = "")
         {
-            
             var allSessions = await _unitOfWork.Repository<Session>()
                 .GetAllAsync(s => s.Include(session => session.Film)
                                    .Include(session => session.Hall));
@@ -306,6 +333,14 @@ namespace Web.Controllers
                 .Where(s => s.DateTimeBeg > DateTime.Now)
                 .OrderBy(s => s.DateTimeBeg)
                 .ToList();
+
+            
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                futureSessions = futureSessions
+                    .Where(s => s.Film.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
 
             int totalSessions = futureSessions.Count;
             int totalPages = (int)Math.Ceiling(totalSessions / (double)pageSize);
@@ -324,11 +359,13 @@ namespace Web.Controllers
                 AllFilms = allFilms.ToList(),
                 AllHalls = allHalls.ToList(),
                 CurrentPage = page,
-                TotalPages = totalPages
+                TotalPages = totalPages,
+                SearchQuery = searchQuery 
             };
 
             return View(model);
         }
+
 
 
         [HttpPost]
@@ -397,16 +434,25 @@ namespace Web.Controllers
             return RedirectToAction("ChangeSession");
         }
 
-        public async Task<IActionResult> DeleteSession(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> DeleteSession(int page = 1, int pageSize = 10, string searchQuery = "")
         {
             var films = await _unitOfWork.Repository<Film>().GetAllAsync();
             var halls = await _unitOfWork.Repository<Hall>().GetAllAsync();
-            var allSessions = await _unitOfWork.Repository<Session>().GetAllAsync();
+            var allSessions = await _unitOfWork.Repository<Session>()
+                .GetAllAsync(s => s.Include(session => session.Film)
+                                   .Include(session => session.Hall));
 
             var futureSessions = allSessions
                 .Where(s => s.DateTimeBeg > DateTime.Now)
                 .OrderBy(s => s.DateTimeBeg)
                 .ToList();
+
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                futureSessions = futureSessions
+                    .Where(s => s.Film.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
 
             int totalSessions = futureSessions.Count;
             int totalPages = (int)Math.Ceiling(totalSessions / (double)pageSize);
@@ -425,11 +471,13 @@ namespace Web.Controllers
                     .Take(pageSize)
                     .ToList(),
                 CurrentPage = page,
-                TotalPages = totalPages
+                TotalPages = totalPages,
+                SearchQuery = searchQuery // Передаємо пошуковий запит у модель
             };
 
             return View(model);
         }
+
 
 
         [HttpPost]
@@ -473,7 +521,7 @@ namespace Web.Controllers
         }
 
 
-        public async Task<IActionResult> DeleteFilm(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> DeleteFilm(string searchQuery = "", int page = 1, int pageSize = 10)
         {
             var model = new FilmViewModel();
 
@@ -484,9 +532,15 @@ namespace Web.Controllers
             model.AllActors = allActors.ToList();
             model.AllGenres = allGenres.ToList();
 
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                allFilms = allFilms.Where(f => f.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+            }
+
             int totalFilms = allFilms.Count();
             model.TotalPages = (int)Math.Ceiling(totalFilms / (double)pageSize);
             model.CurrentPage = page;
+            model.SearchQuery = searchQuery; 
 
             model.AllFilms = allFilms
                 .OrderBy(f => f.Name)
@@ -496,6 +550,7 @@ namespace Web.Controllers
 
             return View(model);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> EditFilm(FilmViewModel model)
@@ -630,7 +685,7 @@ namespace Web.Controllers
         }
 
 
-        public async Task<IActionResult> ChangeFilm(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> ChangeFilm(string searchQuery = "", int page = 1, int pageSize = 10)
         {
             var model = new FilmViewModel();
 
@@ -641,12 +696,18 @@ namespace Web.Controllers
             model.AllActors = allActors.ToList();
             model.AllGenres = allGenres.ToList();
 
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                allFilms = allFilms.Where(f => f.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+            }
+
             int totalFilms = allFilms.Count();
             model.TotalPages = (int)Math.Ceiling(totalFilms / (double)pageSize);
             model.CurrentPage = page;
+            model.SearchQuery = searchQuery; // Додаємо пошуковий запит у модель
 
             model.AllFilms = allFilms
-                .OrderBy(f => f.Name) 
+                .OrderBy(f => f.Name)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -654,9 +715,6 @@ namespace Web.Controllers
             return View(model);
         }
 
-
-
-       
 
 
         //Span

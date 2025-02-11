@@ -50,12 +50,10 @@ namespace Web.Models
         public List<Film> AllFilms { get; set; } = new List<Film>();
 
         public int CurrentPage { get; set; }
-        public int TotalPages { get; set; }
-   
-      
+        public int TotalPages { get; set; }   
         public string Actors { get; set; }
         public string Genres { get; set; }
-     
+        public string SearchQuery {  get; set; }
 
     }
 }

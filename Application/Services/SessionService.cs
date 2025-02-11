@@ -27,7 +27,7 @@ public class SessionService : ISessionService
         // Фільтрація за назвою фільму (пошук часткового збігу)
         if (!string.IsNullOrEmpty(filter.FilmName))
         {
-            query = query.Where(s => s.Film.Name.Contains(filter.FilmName, StringComparison.OrdinalIgnoreCase));
+            query = query.Where(s => EF.Functions.Like(s.Film.Name, $"%{filter.FilmName}%"));
         } 
         
         // Фільтрація за датою

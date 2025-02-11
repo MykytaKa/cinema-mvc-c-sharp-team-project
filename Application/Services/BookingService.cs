@@ -20,11 +20,10 @@ namespace Application.Services
             var session = await _unitOfWork.Repository<Session>()
                 .GetAsync(s => s.Id == sessionId, includeProperties: "Film,Hall.Seats,Bookings.Tickets.Seat");
 
-            if (!session.Any()) return null;
+            var sessionData = session.FirstOrDefault();
+            
 
-            var sessionData = session.First();
-
-            var bookedSeatIds = sessionData.Bookings
+            var bookedSeatIds = sessionData?.Bookings
                 .Where(b => b.StatusId != 3)  // Якщо StatusId = 3, місце НЕ вважається зайнятим
                 .SelectMany(b => b.Tickets)
                 .Select(t => t.SeatId)
@@ -43,7 +42,7 @@ namespace Application.Services
                         SeatId = seat.Id,
                         Row = seat.Row,
                         Column = seat.Column,
-                        IsBooked = bookedSeatIds.Contains(seat.Id)
+                        IsBooked = bookedSeatIds != null && bookedSeatIds.Contains(seat.Id)
                     })
                     .ToList()
             };
@@ -57,11 +56,9 @@ namespace Application.Services
             var session = await _unitOfWork.Repository<Session>()
                 .GetAsync(s => s.Id == bookingDto.SessionId, includeProperties: "Film,Bookings.Tickets.Seat");
 
-            var enumerable = session as Session[] ?? session.ToArray();
+            var sessionData = session.FirstOrDefault();
 
-            var sessionData = enumerable.First();
-
-            var bookedSeatIds = sessionData.Bookings
+            var bookedSeatIds = sessionData?.Bookings
                 .Where(b => b.StatusId != 3)
                 .SelectMany(b => b.Tickets)
                 .Select(t => t.SeatId)
@@ -92,15 +89,9 @@ namespace Application.Services
         }
 
         
-        // Метод, який переносить логіку з контролера в сервіс
+        // шар безпеки та перевірок
         public async Task<(bool IsSuccess, string ErrorMessage, Booking? Booking)> ConfirmBookingAsync(BookSessionDto model, ClaimsPrincipal user)
         {
-            // Перевірка: чи вибрано місця
-            if (model.SelectedSeats.Count == 0)
-            {
-                return (false, "Ви не вибрали місця!", null);
-            }
-
             // Отримання UserId з Claims
             var userIdClaim = user.FindFirstValue("UserId");
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))

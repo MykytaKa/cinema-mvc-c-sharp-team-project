@@ -22,7 +22,7 @@ namespace Application.Services
                 );
             
             return newFilms
-                .OrderBy( f => f.ReleaseRate.Month )
+                .OrderBy( f => f.ReleaseRate )
                 .Select(nf => new NewFilmDTO
                 { 
                     Id = nf.Id,

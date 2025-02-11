@@ -25,7 +25,7 @@ namespace Web.Controllers
             var tickets = await _ticketService.GetTickets(userId, status);
 
             var ticketViewModels = tickets
-                .OrderBy(t => t.Booking.DateTime)
+                .OrderByDescending(t => t.Booking.DateTime)
                 .Select(ticket => new TicketViewModel
                 {
                     DateTimeBeg = ticket.Booking.Session.DateTimeBeg,

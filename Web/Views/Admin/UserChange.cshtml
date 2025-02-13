@@ -1,11 +1,11 @@
 ﻿@model UserViewModel
 
 <h2>Change User Role</h2>
-<form method="get" asp-action="DeleteUser">
+<form method="get" asp-action="UserChange">
     <div class="input-group mb-3">
         <input type="text" name="searchQuery" value="@Model.SearchQuery" class="form-control" placeholder="Search by name or email..." />
         <button type="submit" class="btn btn-primary">Search</button>
-        <a href="@Url.Action("DeleteUser")" class="btn btn-secondary">Reset</a>
+        <a href="@Url.Action("UserChange")" class="btn btn-secondary">Reset</a>
     </div>
 </form>
 <table class="table table-bordered">

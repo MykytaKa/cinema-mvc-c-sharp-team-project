@@ -1,0 +1,61 @@
+﻿@model Web.Models.FilmOccupancyListViewModel
+
+<h2>The average percentage of occupancy of the hall</h2>
+
+<form method="get" asp-action="FilmOccupancy" class="mb-3 d-flex">
+    <label class="me-2">Sort by:</label>
+    <select name="sortBy" class="form-control me-2">
+        <option value="name" selected="@(Model.SortBy == "name" ? "selected" : null)">A-Z</option>
+        <option value="maxOccupancy" selected="@(Model.SortBy == "maxOccupancy" ? "selected" : null)">Most Occupied</option>
+        <option value="minOccupancy" selected="@(Model.SortBy == "minOccupancy" ? "selected" : null)">Least Occupied</option>
+    </select>
+
+    <label class="ms-3 me-2">From:</label>
+    <input type="date" name="startDate" value="@Model.DateTimeBeg?.ToString("yyyy-MM-dd")" class="form-control me-2" />
+
+    <label class="me-2">To:</label>
+    <input type="date" name="endDate" value="@Model.DateTimeEnd?.ToString("yyyy-MM-dd")" class="form-control me-2" />
+
+    <button type="submit" class="btn btn-primary me-2">Filter</button>
+
+    <a asp-action="FilmOccupancy" class="btn btn-secondary">Reset Filters</a>
+</form>
+
+<form method="get" asp-action="ExportOccupancyToExcel" class="mb-3">
+    <input type="hidden" name="sortBy" value="@Model.SortBy" />
+    <input type="hidden" name="startDate" value="@Model.DateTimeBeg?.ToString("yyyy-MM-dd")" />
+    <input type="hidden" name="endDate" value="@Model.DateTimeEnd?.ToString("yyyy-MM-dd")" />
+    <button type="submit" class="btn btn-success">Download as Excel</button>
+</form>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Film</th>
+            <th>Average Occupancy (%)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var film in Model.Statistics)
+        {
+            <tr>
+                <td>@film.FilmName</td>
+                <td>@film.AverageOccupancy %</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination">
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="FilmOccupancy" asp-route-page="@i" asp-route-sortBy="@Model.SortBy">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

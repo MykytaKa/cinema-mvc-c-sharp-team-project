@@ -1,0 +1,179 @@
+﻿@model Web.Models.FilmViewModel
+
+@{
+    ViewData["Title"] = "Add Film";
+}
+
+<h2>Add Film</h2>
+
+<div class="mb-3">
+    <label for="filmSearch" class="form-label">Search Film</label>
+    <input type="text" id="filmSearch" class="form-control" placeholder="Enter film title..." />
+    <button class="btn btn-primary mt-2" onclick="searchFilms()">Search</button>
+</div>
+
+<div id="filmResults" class="mt-3"></div>
+
+@section Scripts {
+    <script>
+        let apiKey = '';
+
+        async function fetchApiKey() {
+            try {
+                const response = await fetch('/Admin/GetApiKey');
+                const data = await response.json();
+                apiKey = data.apiKey;
+            } catch (error) {
+                console.error('Error fetching API key:', error);
+            }
+        }
+        async function searchFilms() {
+            if (!apiKey) {
+                await fetchApiKey();
+            }
+
+            const query = document.getElementById('filmSearch').value;
+            if (!query) return;
+
+            const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${query}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.results.length > 0) {
+                    displayFilms(data.results);
+                } else {
+                    document.getElementById('filmResults').innerHTML = '<p>No films found.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching films:', error);
+            }
+        }
+        async function displayFilms(films) {
+            const filmResults = document.getElementById('filmResults');
+            filmResults.innerHTML = '';
+
+            for (const film of films) {
+                const details = await getFilmDetails(film.id);
+
+                const filmCard = document.createElement('div');
+                filmCard.className = 'card mb-3';
+
+                filmCard.innerHTML = `
+                            <div class="card-body">
+                                <h5 class="card-title">${film.title}</h5>
+                                <img src="${film.poster_path ? `https://image.tmdb.org/t/p/w500${film.poster_path}` : ''}" alt="Poster" class="img-fluid mb-2"/>
+                                <p class="card-text">${film.overview || 'No description available.'}</p>
+                                <p><strong>Release Date:</strong> ${film.release_date || 'Unknown'}</p>
+                                <p><strong>Rating:</strong> ${film.vote_average || 'N/A'}</p>
+                                <p><strong>Duration:</strong> ${details.runtime ? details.runtime + ' minutes' : 'N/A'}</p>
+                                <p><strong>Age Rating:</strong> ${details.certification || 'N/A'}</p>
+                                <p><strong>Director:</strong> ${details.director || 'N/A'}</p>
+                                <p><strong>Genres:</strong> ${details.genres || 'N/A'}</p>
+                                <p><strong>Trailer:</strong> <a href="${details.trailerUrl || '#'}" target="_blank">Watch Trailer</a></p>
+                                <p><strong>Actors:</strong> ${details.actors || 'N/A'}</p>
+                                <button class="btn btn-success" onclick="addFilmToDB(${film.id}, '${film.title.replace(/'/g, "\\'")}', '${film.poster_path}', '${film.overview.replace(/'/g, "\\'")}', '${film.release_date}', ${film.vote_average}, ${details.runtime}, '${details.certification.replace(/'/g, "\\'")}', '${details.director.replace(/'/g, "\\'")}', '${details.genres.replace(/'/g, "\\'")}', '${details.trailerUrl}', '${details.actors.replace(/'/g, "\\'")}')">Add</button>
+
+                            </div>
+                        `;
+                filmResults.appendChild(filmCard);
+            }
+        }
+
+        async function getFilmDetails(movieId) {
+            
+            const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&append_to_response=videos,release_dates,credits`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                let certification = 'N/A';
+                if (data.release_dates && data.release_dates.results) {
+                    const usRelease = data.release_dates.results.find(release => release.iso_3166_1 === 'US');
+                    if (usRelease && usRelease.release_dates.length > 0) {
+                        certification = usRelease.release_dates[0].certification || 'N/A';
+                    }
+                }
+
+                let director = 'N/A';
+                if (data.credits && data.credits.crew) {
+                    const directorInfo = data.credits.crew.find(member => member.job === 'Director');
+                    if (directorInfo) {
+                        director = directorInfo.name;
+                    }
+                }
+
+                let genres = 'N/A';
+                if (data.genres && data.genres.length > 0) {
+                    genres = data.genres.map(genre => genre.name).join(', ');
+                }
+
+                let trailerUrl = 'N/A';
+                if (data.videos && data.videos.results) {
+                    const trailer = data.videos.results.find(video => video.type === 'Trailer' && video.site === 'YouTube');
+                    if (trailer) {
+                        trailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
+                    }
+                }
+
+                let actors = 'N/A';
+                if (data.credits && data.credits.cast) {
+                    actors = data.credits.cast.slice(0, 5).map(actor => actor.name).join(', ');
+                }
+
+                return {
+                    runtime: data.runtime,
+                    certification: certification,
+                    director: director,
+                    genres: genres,
+                    trailerUrl: trailerUrl,
+                    actors: actors
+                };
+            } catch (error) {
+                console.error('Error fetching film details:', error);
+                return {
+                    runtime: 'N/A',
+                    certification: 'N/A',
+                    director: 'N/A',
+                    genres: 'N/A',
+                    trailerUrl: 'N/A',
+                    actors: 'N/A'
+                };
+            }
+        }
+
+        function addFilmToDB(id, title, poster, overview, releaseDate, rating, duration, ageRating, director, genres, trailerUrl, actors) {
+            fetch('/Admin/AddFilmToDB', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    Name: title,
+                    PosterURL: poster ? `https://image.tmdb.org/t/p/w500${poster}` : '',
+                    Description: overview,
+                    ReleaseRate: releaseDate,
+                    Rating: rating,
+                    Duration: duration ? `${duration} minutes` : 'N/A',
+                    AgeRating: ageRating,
+                    Director: director,
+                    Genres: genres,
+                    TrailerURL: trailerUrl,
+                    Actors: actors
+                })
+            })
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(result => {
+                    if (result.status === 400) {
+                        alert(result.body.message); // Відобразити повідомлення, якщо фільм вже є
+                    } else {
+                        alert('Film added successfully!');
+                    }
+                })
+                .catch(error => console.error('Error adding film:', error));
+        }
+
+    </script>
+}

@@ -1,0 +1,97 @@
+﻿@model Web.Models.SessionViewModel
+
+<h2>Existing Sessions</h2>
+<form method="get" asp-action="ChangeSession">
+    <div class="input-group mb-3">
+        <input type="text" name="searchQuery" value="@Model.SearchQuery" class="form-control" placeholder="Search film by title..." />
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a href="@Url.Action("ChangeSession")" class="btn btn-secondary">Reset</a>
+    </div>
+</form>
+<link rel="stylesheet" href="~/css/ChangeSession.css" asp-append-version="true" />
+<table class="table">
+    <thead>
+        <tr>
+            <th>Film</th>
+            <th>Hall</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var session in Model.AllSessions)
+        {
+            <tr>
+                <form method="post" action="@Url.Action("UpdateSession", "Admin")">
+                    <input type="hidden" name="SessionId" value="@session.Id" />
+
+                <td>
+                    <select name="FilmId" class="form-control" required>
+                            @foreach (var film in Model.AllFilms)
+                            {
+                            <option value="@film.Id" selected="@(film.Id == session.FilmId)">
+                                    @film.Name
+                            </option>
+                            }
+                    </select>
+                </td>
+
+                <td>
+                    <select name="HallId" class="form-control" required>
+                            @foreach (var hall in Model.AllHalls)
+                            {
+                            <option value="@hall.Id" selected="@(hall.Id == session.HallId)">
+                                    @hall.Name
+                            </option>
+                            }
+                    </select>
+                </td>
+
+                    <td>
+                        <input type="datetime-local" name="DateTimeBeg" 
+                               value="@session.DateTimeBeg.ToString("yyyy-MM-ddTHH:mm")" 
+                               class="form-control" required />
+                    </td>
+
+                    <td>
+                        <input type="datetime-local" value="@session.DateTimeEnd.ToString("yyyy-MM-ddTHH:mm")" 
+                               class="form-control" readonly />
+                    </td>
+
+                    <td>
+                        <input type="number" name="Price"
+                               value="@session.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                               step="0.01" class="form-control" />
+                    </td>
+
+                    <td>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </td>
+                </form>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                <a class="page-link" asp-action="ChangeSession" asp-route-page="@i">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}

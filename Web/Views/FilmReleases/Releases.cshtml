@@ -1,0 +1,229 @@
+﻿@model NewReleasesViewModel
+
+<div class="container-fluid">
+    <div class="row justify-content-start mb-4">
+        <!-- Текст новинок -->
+        <div class="col-12 col-sm-8 col-md-6 col-lg-4 text-right">
+            <h4 class="new-releases-text">New Releases: @System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(Model.Month)<br />@Model.Year</h4>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+            @if (Model.PrevMonth.HasValue && Model.PrevYear.HasValue)
+            {
+                <a asp-action="Releases" asp-route-month="@Model.PrevMonth" asp-route-year="@Model.PrevYear" class="btn custom-nav-btn">
+                    ← @System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(Model.PrevMonth.Value) @Model.PrevYear
+                </a>
+            }
+            else
+            {
+                <button class="btn btn-secondary" disabled>← Previous</button>
+            }
+
+            <a asp-action="Releases" asp-route-month="@Model.NextMonth" asp-route-year="@Model.NextYear" class="btn custom-nav-btn">
+                @System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(Model.NextMonth) @Model.NextYear →
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <!-- Фільми -->
+        <div class="col-12 col-md-9">
+            <div class="row justify-content-center">
+                @foreach (var film in Model.FilmDTOs)
+                {
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                        <a asp-controller="FilmInfo" asp-action="FilmInfo" asp-route-id="@film.Id" class="card text-center film-card shadow-sm" style="text-decoration: none;">
+                            <img src="@film.PosterURL" class="card-img-top" alt="@film.Name" style="max-height: 300px; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title film-name">@film.Name</h5>
+                                <h5 class="card-title release-date">@film.RealeaseDate.ToString("dd.MM.yyyy")</h5>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Форма для фільтрації -->
+        <div class="col-12 col-md-3">
+            <div class="filter-form-container p-3 rounded shadow-sm border border-light">
+                <div class="filter-title mb-4 text-center text-uppercase font-weight-bold">Month & Year Filter</div>
+                <form asp-controller="FilmReleases" asp-action="Releases" method="get">
+                    <div class="form-group">
+                        <label for="month" class="text-black">Month:</label>
+                        <select id="month" name="month" class="form-control">
+                            @if (Model.Year == DateTime.Now.Year)
+                            {
+                                @for (int i = DateTime.Now.Month; i <= 12; i++)
+                                {
+                                    @if (i == Model.Month)
+                                    {
+                                        <option value="@i" selected>@System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(i)</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@i">@System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(i)</option>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                @for (int i = 1; i <= 12; i++)
+                                {
+                                    @if (i == Model.Month)
+                                    {
+                                        <option value="@i" selected>@System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(i)</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@i">@System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(i)</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="year" class="text-black">Year:</label>
+                        <select id="year" name="year" class="form-control" onchange="updateMonths()">
+                            @for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 5; i++)
+                            {
+                                @if (i == Model.Year)
+                                {
+                                    <option value="@i" selected>@i</option>
+                                }
+                                else
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger btn-block">Search</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateMonths() {
+        let currentYear = new Date().getFullYear();
+        let selectedYear = document.getElementById("year").value;
+        let monthSelect = document.getElementById("month");
+
+        monthSelect.innerHTML = "";
+
+        let startMonth = (selectedYear == currentYear) ? new Date().getMonth() + 1 : 1;
+        let months = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        for (let i = startMonth; i <= 12; i++) {
+            let option = document.createElement("option");
+            option.value = i;
+            option.textContent = months[i - 1];
+            monthSelect.appendChild(option);
+        }
+    }
+</script>
+
+<style>
+    :root {
+        --black-color: #262F34;
+        --red-color: #F54A4A;
+        --skin-color: #F1D3BB;
+    }
+
+    .new-releases-text {
+        color: var(--black-color);
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    .filter-form-container {
+        background-color: var(--skin-color);
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+        border-radius: 8px;
+        border: 1px solid var(--black-color);
+    }
+
+    .filter-title {
+        font-size: 18px;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        text-align: center;
+        color: black;
+    }
+
+    .form-group label {
+        font-weight: bold;
+        color: var(--black-color);
+    }
+
+    .form-control {
+        margin-bottom: 15px;
+        background-color: #fff;
+        border: 1px solid var(--black-color);
+    }
+
+    .btn-danger {
+        width: 100%;
+        background-color: var(--red-color);
+        border-color: var(--red-color);
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        background-color: darkred;
+        border-color: darkred;
+    }
+
+    .film-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid var(--black-color);
+        background-color: white;
+        height: 450px;
+        width: 100%;
+    }
+
+    .film-card
+    {
+        max-width: 280px;
+    }
+
+    .film-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .film-name {
+        color: var(--black-color);
+    }
+
+    .release-date {
+        color: var(--red-color);
+    }
+
+    .film-card img {
+        max-height: 300px;
+        object-fit: cover;
+    }
+
+    .custom-nav-btn {
+        background-color: #262F34;
+        color: white;
+        border-color: #262F34;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .custom-nav-btn:hover {
+        background-color: #3a4750;
+        color: #ffffff;
+        border-color: #3a4750;
+    }
+</style>

@@ -1,0 +1,75 @@
+﻿@using Core.Entities
+
+<h2>Change Booking Status</h2>
+<form method="get" asp-action="ChangeBooking">
+    <div class="input-group mb-3">
+        <input type="text" name="searchQuery" value="@Model.SearchQuery" class="form-control" placeholder="Search by user name..." />
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a href="@Url.Action("ChangeBooking")" class="btn btn-secondary">Reset</a>
+    </div>
+</form>
+<link rel="stylesheet" href="~/css/ChangeBooking.css" asp-append-version="true" />
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Film</th>
+            <th>Session Time</th>
+            <th class="seats-column">Seats</th> 
+            <th>Current Status</th>
+            <th>New Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var booking in Model.AllBookings)
+        {
+            <tr>
+                <td>@booking.User.FirstName @booking.User.LastName</td>
+                <td><div class="film-name">@booking.Session.Film.Name</div></td>
+                <td>
+                    <div>Beg @booking.Session.DateTimeBeg</div>
+                    <div>End @booking.Session.DateTimeEnd</div>
+                </td>
+
+                <td>
+                    @if (Model.BookingSeats.TryGetValue(booking.Id, out List<Seat> seats) && seats.Any())
+                    {
+                        <div class="tooltip-container">
+                            <div class="tooltip-content">
+                                @foreach (var seat in seats)
+                                {
+                                    <div>Row: @seat.Row, Col: @seat.Column</div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <span>No seats reserved</span>
+                    }
+                </td>
+
+
+
+                <td>@booking.Status.Name</td>
+                <td>
+                    <form asp-action="ChangeBookingStatus" method="post" class="d-flex">
+                        <input type="hidden" name="bookingId" value="@booking.Id" />
+                        <select name="newStatusId" class="form-control me-2 bigger-select">
+                            @foreach (var status in Model.AvailableStatuses)
+                            {
+                                <option value="@status.Id" selected="@(booking.Status?.Id == status.Id ? "selected" : null)">
+                                    @status.Name
+                                </option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+

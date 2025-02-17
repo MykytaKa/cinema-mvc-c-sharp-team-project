@@ -1,0 +1,128 @@
+﻿@* @model Core.Models.BookSessionViewModel *@
+@* *@
+@* <div class="container"> *@
+@*     <h2>Бронювання: @Model.FilmName</h2> *@
+@*     <p><strong>Дата:</strong> @Model.SessionDate.ToString("dd.MM.yyyy HH:mm")</p> *@
+@*     <p><strong>Зала:</strong> @Model.HallName</p> *@
+@*     <p><strong>Ціна:</strong> @Model.SessionPrice грн</p> *@
+@* *@
+@*     <form method="post" asp-action="ConfirmBooking"> *@
+@*         <input type="hidden" asp-for="SessionId" /> *@
+@*         <label>Оберіть місця:</label> *@
+@*         <div> *@
+@*             @foreach (var seat in Model.AvailableSeats) *@
+@*             { *@
+@*                 <div> *@
+@*                     <input type="checkbox" name="SelectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" /> *@
+@*                     <label for="seat-@seat.SeatId">Ряд @seat.Row, Місце @seat.Column</label> *@
+@*                 </div> *@
+@*             } *@
+@*         </div> *@
+@*         <button type="submit" class="btn btn-primary">Підтвердити</button> *@
+@*     </form> *@
+@* *@
+@* </div> *@
+
+@model Web.Models.BookSessionViewModel
+
+<div class="container text-center">
+    <h2 class="mb-3">@Model.FilmName</h2>
+    <p><strong>Date:</strong> @Model.SessionDate.ToString("dd.MM.yyyy HH:mm")</p>
+    <p><strong>Hall:</strong> @Model.HallName</p>
+
+    <!-- Легенда цін -->
+    <div class="d-flex justify-content-center align-items-center mb-3">
+        <span class="seat-legend standard"></span> @Model.SessionPrice UAH
+        <span class="seat-legend booked ms-3"></span> Reserved
+    </div>
+
+    <!-- Місця у залі -->
+    <form method="post" asp-action="ConfirmBooking">
+        <input type="hidden" asp-for="SessionId" />
+
+        <div class="screen text-center mb-4">SCREEN</div>
+
+        <div class="seat-container">
+            @foreach (var row in Model.AvailableSeats.GroupBy(s => s.Row).OrderBy(r => r.Key)) // Додаємо OrderBy
+            {
+                <div class="seat-row">
+                    <span class="row-number">@row.Key</span> <!-- Номер ряду -->
+                    @foreach (var seat in row.OrderBy(s => s.Column)) // Додаємо сортування місць в рядку
+                    {
+                        var isBooked = seat.IsBooked ? "booked" : "";
+                        var isDisabled = seat.IsBooked ? "disabled" : "";
+
+                        <label class="seat @isBooked" data-row="@seat.Row" data-column="@seat.Column"
+                               onmouseover="showSeatNumber(this)" onmouseout="hideSeatNumber()">
+                            <input type="checkbox" name="SelectedSeats" value="@seat.SeatId" class="seat-checkbox"
+                                   data-price="@Model.SessionPrice" onchange="updateTotalPrice()" @isDisabled />
+                            <span></span>
+                        </label>
+                    }
+                    <span class="row-number">@row.Key</span> <!-- Номер ряду -->
+                </div>
+            }
+        </div>
+
+        <!-- Відображення загальної вартості -->
+        <div class="total-price mt-3">
+            <strong>Total amount: <span id="total-price">0</span> UAH</strong>
+        </div>
+
+        <!-- Підсвічений номер місця -->
+        <div id="seat-info" class="seat-info">Row: -, Seat: -</div>
+
+        <button id="confirmButton" type="submit" class="btn btn-warning btn-lg mt-4" disabled>BUY TICKETS</button>
+    </form>
+</div>
+
+<!-- Скрипти -->
+<script>
+    function showSeatNumber(seat) {
+        var row = seat.getAttribute("data-row");
+        var column = seat.getAttribute("data-column");
+        var seatInfo = document.getElementById("seat-info");
+
+        if (!seat.classList.contains("booked")) {
+            seatInfo.innerText = `Row: ${row}, Seat: ${column}`;
+            seatInfo.style.display = "block";
+        }
+    }
+
+    function hideSeatNumber() {
+        var seatInfo = document.getElementById("seat-info");
+        seatInfo.style.display = "none";
+    }
+
+    function updateTotalPrice() {
+        let totalPrice = 0;
+        document.querySelectorAll(".seat-checkbox:checked").forEach(seat => {
+            totalPrice += parseFloat(seat.getAttribute("data-price"));
+        });
+        document.getElementById("total-price").innerText = totalPrice;
+
+        updateButtonState(); // Викликаємо функцію для оновлення кнопки
+    }
+
+    function updateButtonState() {
+        const checkboxes = document.querySelectorAll(".seat-checkbox");
+        const confirmButton = document.getElementById("confirmButton");
+
+        // Перевіряємо, чи є хоча б один вибраний чекбокс
+        const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+        confirmButton.disabled = !anyChecked; // Якщо немає вибору - кнопка заблокована
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkboxes = document.querySelectorAll(".seat-checkbox");
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", updateTotalPrice);
+        });
+
+        updateButtonState(); // Запускаємо перевірку при завантаженні сторінки
+    });
+</script>
+
+
+
+

@@ -1,0 +1,60 @@
+﻿@model FilmViewModel
+
+<h2>Delete Film</h2>
+
+<form method="get" asp-action="DeleteFilm">
+    <div class="input-group mb-3">
+        <input type="text" name="searchQuery" value="@Model.SearchQuery" class="form-control" placeholder="Search film by title..." />
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a href="@Url.Action("DeleteFilm")" class="btn btn-secondary">Reset</a>
+    </div>
+</form>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Poster</th>
+            <th>Year</th>
+            <th>Genre</th>
+            <th>Age Rating</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var film in Model.AllFilms)
+        {
+            <tr>
+                <td>@film.Name</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(film.PosterURL))
+                    {
+                        <img src="@film.PosterURL" alt="Poster" style="width: 80px; height: auto; border-radius: 5px;" />
+                    }
+                </td>
+                <td>@film.ReleaseRate.ToShortDateString()</td>
+                <td>@film.Director</td>
+                <td>@film.AgeRating</td>
+                <td>
+                    <form asp-action="DeleteFilmById" method="post" style="display:inline;">
+                        <input type="hidden" name="filmId" value="@film.Id" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <nav>
+        <ul class="pagination">
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="DeleteFilm" asp-route-page="@i" asp-route-searchQuery="@Model.SearchQuery">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
